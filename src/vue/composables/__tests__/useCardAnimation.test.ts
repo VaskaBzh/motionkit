@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { useCardAnimation } from '../useCardAnimation.js';
 
 function makeElement(left = 0, top = 0): HTMLElement {
@@ -84,7 +84,7 @@ describe('useCardAnimation', () => {
 
 		await animateMove([el]);
 
-		const [, opts] = (el.animate as ReturnType<typeof vi.fn>).mock.calls[0];
+		const [, opts] = (el.animate as Mock).mock.calls[0] as [Keyframe[], KeyframeAnimationOptions];
 		expect(opts.duration).toBe(500);
 		expect(opts.easing).toBe('linear');
 	});
@@ -96,6 +96,7 @@ describe('useCardAnimation', () => {
 		await animateMove([el]);
 
 		expect(isAnimating.value).toBe(false);
+		// eslint-disable-next-line @typescript-eslint/unbound-method
 		expect(el.animate).not.toHaveBeenCalled();
 	});
 });

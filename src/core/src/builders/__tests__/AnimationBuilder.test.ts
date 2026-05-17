@@ -55,8 +55,8 @@ describe('AnimationBuilder', () => {
 		const runner = new AnimationBuilder(calc).buildMoveAnimation([el1, el2]);
 		// runner.play() должен запустить обе анимации без ошибок
 		// Web Animations API в happy-dom не поддерживается, поэтому мокаем element.animate
-		el1.animate = vi.fn().mockReturnValue({ finished: Promise.resolve(), reverse: vi.fn() } as any);
-		el2.animate = vi.fn().mockReturnValue({ finished: Promise.resolve(), reverse: vi.fn() } as any);
+		el1.animate = vi.fn().mockReturnValue({ finished: Promise.resolve(), reverse: vi.fn() });
+		el2.animate = vi.fn().mockReturnValue({ finished: Promise.resolve(), reverse: vi.fn() });
 
 		expect(runner).toBeDefined();
 	});
