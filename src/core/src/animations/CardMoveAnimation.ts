@@ -35,7 +35,7 @@ export class CardMoveAnimation extends BaseAnimation {
 				duration: this.#options.duration,
 				easing: this.#options.easing,
 				delay: this.#options.delay,
-				fill: 'none',
+				fill: 'backwards',
 			}
 		);
 

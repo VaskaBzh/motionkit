@@ -1,16 +1,20 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { CardMoveAnimation } from '../CardMoveAnimation.js';
 import type { Trajectory } from '../../types.js';
 
-function makeAnimationMock() {
-	const mock = {
+interface AnimationLike {
+	finished: Promise<void>;
+	reverse: Mock;
+}
+
+function makeAnimationMock(): AnimationLike {
+	return {
 		finished: Promise.resolve(),
 		reverse: vi.fn(),
 	};
-	return mock;
 }
 
-function makeElement() {
+function makeElement(): HTMLElement {
 	const el = document.createElement('div');
 	el.animate = vi.fn().mockReturnValue(makeAnimationMock());
 	return el;
@@ -31,8 +35,9 @@ describe('CardMoveAnimation', () => {
 		const anim = new CardMoveAnimation(el, makeTrajectory(el, 100, 50));
 		await anim.play();
 
+		// eslint-disable-next-line @typescript-eslint/unbound-method
 		expect(el.animate).toHaveBeenCalledOnce();
-		const [keyframes] = (el.animate as ReturnType<typeof vi.fn>).mock.calls[0];
+		const [keyframes] = (el.animate as Mock).mock.calls[0] as [Keyframe[]];
 		expect(keyframes[0]).toEqual({ transform: 'translate(100px, 50px)' });
 		expect(keyframes[1]).toEqual({ transform: 'translate(0px, 0px)' });
 	});
@@ -45,18 +50,18 @@ describe('CardMoveAnimation', () => {
 		});
 		await anim.play();
 
-		const [, opts] = (el.animate as ReturnType<typeof vi.fn>).mock.calls[0];
+		const [, opts] = (el.animate as Mock).mock.calls[0] as [Keyframe[], KeyframeAnimationOptions];
 		expect(opts.duration).toBe(500);
 		expect(opts.easing).toBe('linear');
 		expect(opts.delay).toBe(100);
-		expect(opts.fill).toBe('none');
+		expect(opts.fill).toBe('backwards');
 	});
 
 	it('play() использует дефолтные опции если не переданы', async () => {
 		const anim = new CardMoveAnimation(el, makeTrajectory(el));
 		await anim.play();
 
-		const [, opts] = (el.animate as ReturnType<typeof vi.fn>).mock.calls[0];
+		const [, opts] = (el.animate as Mock).mock.calls[0] as [Keyframe[], KeyframeAnimationOptions];
 		expect(opts.duration).toBe(300);
 		expect(opts.easing).toBe('ease');
 		expect(opts.delay).toBe(0);
@@ -64,13 +69,14 @@ describe('CardMoveAnimation', () => {
 
 	it('reverse() после play() вызывает nativeAnimation.reverse()', async () => {
 		const nativeMock = makeAnimationMock();
-		(el.animate as ReturnType<typeof vi.fn>).mockReturnValue(nativeMock);
+		(el.animate as Mock).mockReturnValue(nativeMock);
 
 		const anim = new CardMoveAnimation(el, makeTrajectory(el));
 		await anim.play();
 		await anim.reverse();
 
 		expect(nativeMock.reverse).toHaveBeenCalledOnce();
+		// eslint-disable-next-line @typescript-eslint/unbound-method
 		expect(el.animate).toHaveBeenCalledOnce(); // не вызывается повторно
 	});
 
@@ -78,8 +84,9 @@ describe('CardMoveAnimation', () => {
 		const anim = new CardMoveAnimation(el, makeTrajectory(el, 100, 50));
 		await anim.reverse();
 
+		// eslint-disable-next-line @typescript-eslint/unbound-method
 		expect(el.animate).toHaveBeenCalledOnce();
-		const [keyframes] = (el.animate as ReturnType<typeof vi.fn>).mock.calls[0];
+		const [keyframes] = (el.animate as Mock).mock.calls[0] as [Keyframe[]];
 		expect(keyframes[0]).toEqual({ transform: 'translate(0px, 0px)' });
 		expect(keyframes[1]).toEqual({ transform: 'translate(100px, 50px)' });
 	});
