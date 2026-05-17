@@ -1,6 +1,6 @@
-export { AnimationBuilder } from './builders/AnimationBuilder.js';
-export { AnimationRunner } from './animations/AnimationRunner.js';
-export { CardMoveAnimation } from './animations/CardMoveAnimation.js';
-export { BaseAnimation } from './base/BaseAnimation.js';
-export { TrajectoryCalculator } from './calculators/TrajectoryCalculator.js';
-export type { Trajectory, CardMoveOptions, BuilderConfig, AnimationConstructor } from './types/index.js';
+export { AnimationBuilder } from './builders/AnimationBuilder.ts';
+export { AnimationRunner } from './animations/AnimationRunner.ts';
+export { CardMoveAnimation } from './animations/CardMoveAnimation.ts';
+export { BaseAnimation } from './base/BaseAnimation.ts';
+export { TrajectoryCalculator } from './calculators/TrajectoryCalculator.ts';
+export type { Trajectory, CardMoveOptions, BuilderConfig, AnimationConstructor } from './types';

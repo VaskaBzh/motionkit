@@ -1,14 +1,14 @@
-import { TrajectoryCalculator } from '../calculators/TrajectoryCalculator.js';
-import { CardMoveAnimation } from '../animations/CardMoveAnimation.js';
-import { AnimationRunner } from '../animations/AnimationRunner.js';
-import type { BuilderConfig, AnimationConstructor } from '../types/index.js';
+import { TrajectoryCalculator } from '../calculators/TrajectoryCalculator.ts';
+import { CardMoveAnimation } from '../animations/CardMoveAnimation.ts';
+import { AnimationRunner } from '../animations/AnimationRunner.ts';
+import type { BuilderConfig, AnimationConstructor } from '../types';
 
 /**
  * Fluent builder для создания анимаций карточек.
  *
  * @example
  * ```ts
- * import { CardMoveAnimation } from './animations/CardMoveAnimation.js';
+ * import { CardMoveAnimation } from './animations/CardMoveAnimation.ts';
  *
  * const builder = new AnimationBuilder()
  *   .use(CardMoveAnimation)

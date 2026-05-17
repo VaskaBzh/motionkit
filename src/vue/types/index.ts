@@ -1,1 +1,1 @@
-export type { CardAnimationComposableOptions, UseCardAnimationReturn } from './composable.js';
+export type { CardAnimationComposableOptions, UseCardAnimationReturn } from './composable.ts';

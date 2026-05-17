@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { TrajectoryCalculator } from '../TrajectoryCalculator.js';
+import { TrajectoryCalculator } from '../TrajectoryCalculator.ts';
 
 function makeElement(rect: Partial<DOMRect> = {}): HTMLElement {
 	const el = document.createElement('div');

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
-import { useCardAnimation } from '../useCardAnimation.js';
+import { useCardAnimation } from '../useCardAnimation.ts';
 
 function makeElement(left = 0, top = 0): HTMLElement {
 	const el = document.createElement('div');

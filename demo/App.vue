@@ -56,7 +56,7 @@
 
 <script setup lang="ts">
 import { ref, nextTick, useTemplateRef } from 'vue';
-import { AnimationBuilder } from '../src/core/src/index.js';
+import { AnimationBuilder } from '../src/core/src';
 
 interface Card {
   id: number;

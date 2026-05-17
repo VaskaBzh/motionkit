@@ -1,3 +1,3 @@
-export type { Trajectory } from './trajectory.js';
-export type { CardMoveOptions, AnimationConstructor } from './animation.js';
-export type { BuilderConfig } from './builder.js';
+export type { Trajectory } from './trajectory.ts';
+export type { CardMoveOptions, AnimationConstructor } from './animation.ts';
+export type { BuilderConfig } from './builder.ts';

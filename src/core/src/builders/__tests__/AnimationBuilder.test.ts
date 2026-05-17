@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
-import { AnimationBuilder } from '../AnimationBuilder.js';
-import { TrajectoryCalculator } from '../../calculators/TrajectoryCalculator.js';
-import type { AnimationConstructor, Trajectory } from '../../types/index.js';
+import { AnimationBuilder } from '../AnimationBuilder.ts';
+import { TrajectoryCalculator } from '../../calculators/TrajectoryCalculator.ts';
+import type { AnimationConstructor, Trajectory } from '../../types';
 
 function makeTrajectory(el: HTMLElement, dx = 100, dy = 50): Trajectory {
 	return { element: el, deltaX: dx, deltaY: dy };

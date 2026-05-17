@@ -1,4 +1,4 @@
-import type { BaseAnimation } from '../base/BaseAnimation.js';
+import type { BaseAnimation } from '../base/BaseAnimation.ts';
 
 /**
  * Оркестратор: запускает набор анимаций параллельно и ждёт их завершения.
