@@ -16,6 +16,7 @@ coverage
 # AI Factory
 .ai-factory/PLAN.md
 .ai-factory/FIX_PLAN.md
+.ai-factory/plans/
 
 # Editor directories and files
 .vscode/*
