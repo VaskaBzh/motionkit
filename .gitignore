@@ -13,10 +13,12 @@ dist-ssr
 *.local
 coverage
 
-# AI Factory
-.ai-factory/PLAN.md
-.ai-factory/FIX_PLAN.md
-.ai-factory/plans/
+# AI tooling
+.ai-factory/
+.ai-factory.json
+.claude/
+AGENTS.md
+CLAUDE.md
 
 # Editor directories and files
 .vscode/*
