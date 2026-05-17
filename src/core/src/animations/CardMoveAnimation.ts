@@ -1,4 +1,4 @@
-import { BaseAnimation } from './BaseAnimation.js';
+import { BaseAnimation } from '../base/BaseAnimation.js';
 import type { CardMoveOptions, Trajectory } from '../types';
 
 /**

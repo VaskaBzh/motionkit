@@ -13,10 +13,11 @@
 ## Структура модулей
 
 - `src/core/` — фреймворк-нейтральный движок анимаций
-  - `src/core/src/animations/` — классы анимаций (BaseAnimation, CardMoveAnimation, AnimationRunner)
+  - `src/core/src/base/` — абстрактные контракты (BaseAnimation)
+  - `src/core/src/animations/` — конкретные реализации (CardMoveAnimation, AnimationRunner)
   - `src/core/src/builders/` — fluent builder (AnimationBuilder)
-  - `src/core/src/trajectory/` — расчёт траекторий (TrajectoryCalculator)
-  - `src/core/src/types.ts` — общие интерфейсы
+  - `src/core/src/calculators/` — расчёт траекторий (TrajectoryCalculator)
+  - `src/core/src/types/` — общие интерфейсы (Trajectory, CardMoveOptions, BuilderConfig, AnimationConstructor)
 - `src/vue/` — Vue 3 интеграция
   - `src/vue/composables/` — Vue composables
 

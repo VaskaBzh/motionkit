@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { AnimationRunner } from '../AnimationRunner.js';
-import { BaseAnimation } from '../BaseAnimation.js';
+import { BaseAnimation } from '../../base/BaseAnimation.js';
 
 class FakeAnimation extends BaseAnimation {
 	play = vi.fn().mockResolvedValue(undefined);

@@ -1,4 +1,4 @@
-import type { Trajectory } from '../types';
+import type { Trajectory } from '../types/index.js';
 
 type Position = { x: number; y: number };
 

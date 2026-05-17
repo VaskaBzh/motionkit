@@ -1,7 +1,7 @@
-import { TrajectoryCalculator } from '../trajectory/TrajectoryCalculator.js';
+import { TrajectoryCalculator } from '../calculators/TrajectoryCalculator.js';
 import { CardMoveAnimation } from '../animations/CardMoveAnimation.js';
 import { AnimationRunner } from '../animations/AnimationRunner.js';
-import type { BuilderConfig, AnimationConstructor } from '../types';
+import type { BuilderConfig, AnimationConstructor } from '../types/index.js';
 
 /**
  * Fluent builder для создания анимаций карточек.

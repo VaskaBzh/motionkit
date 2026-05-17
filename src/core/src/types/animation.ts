@@ -1,5 +1,5 @@
 import type { Trajectory } from './trajectory.js';
-import type { BaseAnimation } from '../animations/BaseAnimation.js';
+import type { BaseAnimation } from '../base/BaseAnimation.js';
 
 /** Опции анимации для отдельной карточки. */
 export interface CardMoveOptions {
