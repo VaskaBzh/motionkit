@@ -36,6 +36,7 @@ await builder.buildAnimation(cards).play();
 - **Stagger** — волновой эффект задержек между карточками
 - **Plugin API** — подключи свой класс анимации через `.use()`
 - **Vue 3** — готовый composable `useCardAnimation`
+- **React** — хук `useCardAnimation` с поддержкой FLIP-паттерна
 - **TypeScript** — полная типизация из коробки
 
 ## Vue 3
@@ -55,6 +56,34 @@ async function onReorder() {
   await animateMove(cards.value);
 }
 ```
+
+## React
+
+```tsx
+import { useRef, useState, useEffect } from 'react';
+import { useCardAnimation } from '@motionlab/motionkit/react';
+
+function MyList() {
+  const cardRefs = useRef<(HTMLElement | null)[]>([]);
+  const shouldAnimate = useRef(false);
+  const [cards, setCards] = useState([...]);
+  const { snapshot, animateMove, isAnimating } = useCardAnimation({ duration: 400, stagger: 30 });
+
+  useEffect(() => {
+    if (!shouldAnimate.current) return;
+    shouldAnimate.current = false;
+    void animateMove(cardRefs.current.filter(Boolean));
+  }, [cards, animateMove]);
+
+  const shuffle = () => {
+    snapshot(cardRefs.current.filter(Boolean));
+    shouldAnimate.current = true;
+    setCards(prev => shuffleArray([...prev]));
+  };
+}
+```
+
+Открыть React demo: [react.html](react.html)
 
 ---
 
