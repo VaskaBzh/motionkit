@@ -8,5 +8,5 @@
     "declarationDir": "dist",
     "rootDir": "src"
   },
-  "include": ["src/core", "src/vue"]
+  "include": ["src/core", "src/vue", "src/react"]
 }

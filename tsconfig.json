@@ -20,7 +20,8 @@
     "noFallthroughCasesInSwitch": true,
     "strict": true,
     "noImplicitOverride": true,
-    "exactOptionalPropertyTypes": true
+    "exactOptionalPropertyTypes": true,
+    "jsx": "react-jsx"
   },
-  "include": ["src"]
+  "include": ["src", "demo-react"]
 }

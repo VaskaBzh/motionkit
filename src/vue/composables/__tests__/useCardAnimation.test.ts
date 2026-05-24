@@ -1,18 +1,6 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { useCardAnimation } from '../useCardAnimation.ts';
-
-function makeElement(left = 0, top = 0): HTMLElement {
-	const el = document.createElement('div');
-	vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
-		left, top, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0,
-		toJSON: () => ({}),
-	});
-	el.animate = vi.fn().mockReturnValue({
-		finished: Promise.resolve(),
-		reverse: vi.fn(),
-	});
-	return el;
-}
+import { makeElement } from '../../../__tests__/makeElement.ts';
 
 describe('useCardAnimation', () => {
 	beforeEach(() => {
@@ -47,12 +35,7 @@ describe('useCardAnimation', () => {
 	it('isAnimating становится false даже при ошибке', async () => {
 		const { snapshot, animateMove, isAnimating } = useCardAnimation();
 
-		const el = document.createElement('div');
-		vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
-			left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0,
-			toJSON: () => ({}),
-		});
-		// animate выбрасывает ошибку
+		const el = makeElement(0, 0);
 		el.animate = vi.fn().mockReturnValue({
 			finished: Promise.reject(new Error('animation failed')),
 			reverse: vi.fn(),
