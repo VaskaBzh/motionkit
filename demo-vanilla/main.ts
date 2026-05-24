@@ -8,11 +8,12 @@ const LABELS = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Th
 const MAX_CARDS = 12;
 
 function makeCardEl(card: Card): HTMLElement {
-  const el = document.createElement('div');
-  el.className = 'card';
+  const tpl = document.getElementById('card-tpl') as HTMLTemplateElement;
+  const el = (tpl.content.cloneNode(true) as DocumentFragment).querySelector<HTMLElement>('.card')!;
   el.style.setProperty('--card-color', card.color);
   el.dataset['id'] = String(card.id);
-  el.innerHTML = `<span class="card__title">${card.title}</span><span class="card__id">#${card.id}</span>`;
+  el.querySelector('.card__title')!.textContent = card.title;
+  el.querySelector('.card__id')!.textContent = `#${card.id}`;
   return el;
 }
 
@@ -22,8 +23,19 @@ function getCards(grid: HTMLElement): HTMLElement[] {
 
 // ── Shuffle Demo ─────────────────────────────────────────────────────────────
 
-function mountShuffleDemo(container: HTMLElement): void {
-  const shuffleCards: Card[] = [
+function mountShuffleDemo(): void {
+  const grid = document.getElementById('s-grid')!;
+  const btn = document.getElementById('s-shuffle') as HTMLButtonElement;
+  const durationInput = document.getElementById('s-duration') as HTMLInputElement;
+  const durationVal = document.getElementById('s-duration-val')!;
+  const staggerInput = document.getElementById('s-stagger') as HTMLInputElement;
+  const staggerVal = document.getElementById('s-stagger-val')!;
+  const easingSelect = document.getElementById('s-easing') as HTMLSelectElement;
+
+  durationInput.addEventListener('input', () => { durationVal.textContent = `${durationInput.value}ms`; });
+  staggerInput.addEventListener('input', () => { staggerVal.textContent = `${staggerInput.value}ms`; });
+
+  const initialCards: Card[] = [
     { id: 1, title: 'Карточка A', color: COLORS[0] },
     { id: 2, title: 'Карточка B', color: COLORS[1] },
     { id: 3, title: 'Карточка C', color: COLORS[2] },
@@ -31,53 +43,7 @@ function mountShuffleDemo(container: HTMLElement): void {
     { id: 5, title: 'Карточка E', color: COLORS[4] },
     { id: 6, title: 'Карточка F', color: COLORS[5] },
   ];
-
-  container.innerHTML = `
-    <div class="controls">
-      <label class="control">
-        <span class="control__label">duration</span>
-        <div class="control__row">
-          <input id="s-duration" type="range" min="100" max="3000" step="50" value="500" />
-          <span id="s-duration-val" class="control__value">500ms</span>
-        </div>
-      </label>
-      <label class="control">
-        <span class="control__label">stagger</span>
-        <div class="control__row">
-          <input id="s-stagger" type="range" min="0" max="300" step="10" value="30" />
-          <span id="s-stagger-val" class="control__value">30ms</span>
-        </div>
-      </label>
-      <label class="control">
-        <span class="control__label">easing</span>
-        <div class="control__row">
-          <select id="s-easing">
-            <option value="ease">ease</option>
-            <option value="ease-in">ease-in</option>
-            <option value="ease-out">ease-out</option>
-            <option value="ease-in-out">ease-in-out</option>
-            <option value="linear">linear</option>
-            <option value="cubic-bezier(0.34, 1.56, 0.64, 1)">spring</option>
-          </select>
-        </div>
-      </label>
-      <button id="s-shuffle" class="btn-shuffle">Перемешать</button>
-    </div>
-    <div id="s-grid" class="card-grid"></div>
-  `;
-
-  const grid = container.querySelector<HTMLElement>('#s-grid')!;
-  const btn = container.querySelector<HTMLButtonElement>('#s-shuffle')!;
-  const durationInput = container.querySelector<HTMLInputElement>('#s-duration')!;
-  const durationVal = container.querySelector<HTMLElement>('#s-duration-val')!;
-  const staggerInput = container.querySelector<HTMLInputElement>('#s-stagger')!;
-  const staggerVal = container.querySelector<HTMLElement>('#s-stagger-val')!;
-  const easingSelect = container.querySelector<HTMLSelectElement>('#s-easing')!;
-
-  durationInput.addEventListener('input', () => { durationVal.textContent = `${durationInput.value}ms`; });
-  staggerInput.addEventListener('input', () => { staggerVal.textContent = `${staggerInput.value}ms`; });
-
-  shuffleCards.forEach(card => { grid.appendChild(makeCardEl(card)); });
+  initialCards.forEach(card => { grid.appendChild(makeCardEl(card)); });
 
   const builder = new AnimationBuilder();
   let animating = false;
@@ -93,7 +59,6 @@ function mountShuffleDemo(container: HTMLElement): void {
     const cards = getCards(grid);
     builder.snapshot(cards);
 
-    // Fisher-Yates shuffle of DOM elements
     for (let i = cards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       const elI = cards[i]!;
@@ -122,33 +87,21 @@ function mountShuffleDemo(container: HTMLElement): void {
 
 // ── Dynamic Demo ─────────────────────────────────────────────────────────────
 
-function mountDynamicDemo(container: HTMLElement): void {
+function mountDynamicDemo(): void {
   let nextId = 5;
   function newCard(): Card {
     const idx = nextId % COLORS.length;
     return { id: nextId++, title: `Карточка ${LABELS[idx] ?? String(nextId)}`, color: COLORS[idx] ?? '#6366f1' };
   }
 
-  container.innerHTML = `
-    <div class="dynamic-actions">
-      <button id="d-add-start" class="btn-action">+ в начало</button>
-      <button id="d-add-end" class="btn-action">+ в конец</button>
-      <button id="d-add-mid" class="btn-action">+ в середину</button>
-      <button id="d-remove-first" class="btn-action">− первую</button>
-      <button id="d-remove-last" class="btn-action">− последнюю</button>
-      <span id="d-counter" class="card-counter">4 / ${MAX_CARDS} карточек</span>
-    </div>
-    <div id="d-grid" class="card-grid"></div>
-  `;
-
-  const grid = container.querySelector<HTMLElement>('#d-grid')!;
-  const counter = container.querySelector<HTMLElement>('#d-counter')!;
+  const grid = document.getElementById('d-grid')!;
+  const counter = document.getElementById('d-counter')!;
   const btns = {
-    addStart: container.querySelector<HTMLButtonElement>('#d-add-start')!,
-    addEnd: container.querySelector<HTMLButtonElement>('#d-add-end')!,
-    addMid: container.querySelector<HTMLButtonElement>('#d-add-mid')!,
-    removeFirst: container.querySelector<HTMLButtonElement>('#d-remove-first')!,
-    removeLast: container.querySelector<HTMLButtonElement>('#d-remove-last')!,
+    addStart: document.getElementById('d-add-start') as HTMLButtonElement,
+    addEnd: document.getElementById('d-add-end') as HTMLButtonElement,
+    addMid: document.getElementById('d-add-mid') as HTMLButtonElement,
+    removeFirst: document.getElementById('d-remove-first') as HTMLButtonElement,
+    removeLast: document.getElementById('d-remove-last') as HTMLButtonElement,
   };
 
   const initialCards: Card[] = [
@@ -190,11 +143,9 @@ function mountDynamicDemo(container: HTMLElement): void {
   btns.addStart.addEventListener('click', () => {
     animate(() => { grid.insertBefore(makeCardEl(newCard()), grid.firstChild); });
   });
-
   btns.addEnd.addEventListener('click', () => {
     animate(() => { grid.appendChild(makeCardEl(newCard())); });
   });
-
   btns.addMid.addEventListener('click', () => {
     animate(() => {
       const children = getCards(grid);
@@ -202,11 +153,9 @@ function mountDynamicDemo(container: HTMLElement): void {
       grid.insertBefore(makeCardEl(newCard()), children[mid] ?? null);
     });
   });
-
   btns.removeFirst.addEventListener('click', () => {
     animate(() => { grid.firstElementChild?.remove(); });
   });
-
   btns.removeLast.addEventListener('click', () => {
     animate(() => { grid.lastElementChild?.remove(); });
   });
@@ -217,37 +166,22 @@ function mountDynamicDemo(container: HTMLElement): void {
 // ── App shell ────────────────────────────────────────────────────────────────
 
 function mount(): void {
-  const root = document.getElementById('app')!;
-  root.innerHTML = `
-    <div class="demo-layout">
-      <header class="demo-header">
-        <h1>motion<span>.js</span> Vanilla demo</h1>
-        <nav class="tabs">
-          <button class="tab-btn tab-btn--active" data-tab="shuffle">Shuffle</button>
-          <button class="tab-btn" data-tab="dynamic">Dynamic</button>
-        </nav>
-      </header>
-      <div id="tab-content"></div>
-    </div>
-  `;
-
-  const content = root.querySelector<HTMLElement>('#tab-content')!;
-  const tabBtns = root.querySelectorAll<HTMLButtonElement>('.tab-btn');
-
-  function renderTab(tab: string): void {
-    content.innerHTML = '';
-    tabBtns.forEach(btn => {
-      btn.classList.toggle('tab-btn--active', btn.dataset['tab'] === tab);
-    });
-    if (tab === 'shuffle') mountShuffleDemo(content);
-    else mountDynamicDemo(content);
-  }
+  const tabBtns = document.querySelectorAll<HTMLButtonElement>('.tab-btn');
+  const sections: Record<string, HTMLElement> = {
+    shuffle: document.getElementById('tab-shuffle')!,
+    dynamic: document.getElementById('tab-dynamic')!,
+  };
 
   tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => { renderTab(btn.dataset['tab'] ?? 'shuffle'); });
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset['tab'] ?? 'shuffle';
+      tabBtns.forEach(b => { b.classList.toggle('tab-btn--active', b.dataset['tab'] === tab); });
+      Object.entries(sections).forEach(([key, el]) => { el.hidden = key !== tab; });
+    });
   });
 
-  renderTab('shuffle');
+  mountShuffleDemo();
+  mountDynamicDemo();
 }
 
 mount();
