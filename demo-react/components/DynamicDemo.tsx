@@ -1,5 +1,6 @@
+import type { JSX } from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { useCardAnimation } from '../../src/react/index.ts';
+import { useCardAnimation } from '../../src/react';
 
 interface Card {
 	id: number;
@@ -25,7 +26,7 @@ const INITIAL_CARDS: Card[] = [
 	{ id: 4, title: 'Карточка Delta', color: COLORS[3] },
 ];
 
-export default function DynamicDemo() {
+export default function DynamicDemo(): JSX.Element {
 	const [cards, setCards] = useState<Card[]>(INITIAL_CARDS);
 
 	const cardRefs = useRef<(HTMLElement | null)[]>([]);
@@ -39,20 +40,22 @@ export default function DynamicDemo() {
 		void animateMove(cardRefs.current.filter((el): el is HTMLElement => el !== null));
 	}, [cards, animateMove]);
 
-	const triggerChange = (updater: (prev: Card[]) => Card[]) => {
+	const triggerChange = (updater: (prev: Card[]) => Card[]): void => {
 		snapshot(cardRefs.current.filter((el): el is HTMLElement => el !== null));
 		shouldAnimate.current = true;
 		setCards(updater);
 	};
 
-	const addStart = () => triggerChange(prev => [newCard(), ...prev]);
-	const addEnd = () => triggerChange(prev => [...prev, newCard()]);
-	const addMiddle = () => triggerChange(prev => {
-		const mid = Math.floor(prev.length / 2);
-		return [...prev.slice(0, mid), newCard(), ...prev.slice(mid)];
-	});
-	const removeFirst = () => triggerChange(prev => prev.slice(1));
-	const removeLast = () => triggerChange(prev => prev.slice(0, -1));
+	const addStart = (): void => { triggerChange(prev => [newCard(), ...prev]); };
+	const addEnd = (): void => { triggerChange(prev => [...prev, newCard()]); };
+	const addMiddle = (): void => {
+		triggerChange(prev => {
+			const mid = Math.floor(prev.length / 2);
+			return [...prev.slice(0, mid), newCard(), ...prev.slice(mid)];
+		});
+	};
+	const removeFirst = (): void => { triggerChange(prev => prev.slice(1)); };
+	const removeLast = (): void => { triggerChange(prev => prev.slice(0, -1)); };
 
 	const full = cards.length >= MAX_CARDS;
 	const empty = cards.length === 0;

@@ -1,10 +1,11 @@
+import type { JSX } from 'react';
 import { useState } from 'react';
 import ShuffleDemo from './components/ShuffleDemo.tsx';
 import DynamicDemo from './components/DynamicDemo.tsx';
 
 type Tab = 'shuffle' | 'dynamic';
 
-export default function App() {
+export default function App(): JSX.Element {
 	const [tab, setTab] = useState<Tab>('shuffle');
 
 	return (
@@ -14,13 +15,13 @@ export default function App() {
 				<nav className="tabs">
 					<button
 						className={`tab-btn${tab === 'shuffle' ? ' tab-btn--active' : ''}`}
-						onClick={() => setTab('shuffle')}
+						onClick={() => { setTab('shuffle'); }}
 					>
 						Shuffle
 					</button>
 					<button
 						className={`tab-btn${tab === 'dynamic' ? ' tab-btn--active' : ''}`}
-						onClick={() => setTab('dynamic')}
+						onClick={() => { setTab('dynamic'); }}
 					>
 						Dynamic
 					</button>

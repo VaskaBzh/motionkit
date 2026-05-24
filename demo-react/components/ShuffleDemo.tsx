@@ -1,5 +1,6 @@
+import type { JSX } from 'react';
 import { useState, useRef, useEffect } from 'react';
-import { useCardAnimation } from '../../src/react/index.ts';
+import { useCardAnimation } from '../../src/react';
 
 interface Card {
 	id: number;
@@ -25,7 +26,7 @@ function shuffleArray<T>(arr: T[]): T[] {
 	return result;
 }
 
-export default function ShuffleDemo() {
+export default function ShuffleDemo(): JSX.Element {
 	const [cards, setCards] = useState<Card[]>(INITIAL_CARDS);
 	const [duration, setDuration] = useState(500);
 	const [stagger, setStagger] = useState(30);
@@ -42,7 +43,7 @@ export default function ShuffleDemo() {
 		void animateMove(cardRefs.current.filter((el): el is HTMLElement => el !== null));
 	}, [cards, animateMove]);
 
-	const handleShuffle = () => {
+	const handleShuffle = (): void => {
 		snapshot(cardRefs.current.filter((el): el is HTMLElement => el !== null));
 		shouldAnimate.current = true;
 		setCards(prev => shuffleArray(prev));
@@ -57,7 +58,7 @@ export default function ShuffleDemo() {
 						<input
 							type="range" min={100} max={3000} step={50}
 							value={duration}
-							onChange={e => setDuration(Number(e.target.value))}
+							onChange={e => { setDuration(Number(e.target.value)); }}
 						/>
 						<span className="control__value">{duration}ms</span>
 					</div>
@@ -69,7 +70,7 @@ export default function ShuffleDemo() {
 						<input
 							type="range" min={0} max={300} step={10}
 							value={stagger}
-							onChange={e => setStagger(Number(e.target.value))}
+							onChange={e => { setStagger(Number(e.target.value)); }}
 						/>
 						<span className="control__value">{stagger}ms</span>
 					</div>
@@ -78,7 +79,7 @@ export default function ShuffleDemo() {
 				<label className="control">
 					<span className="control__label">easing</span>
 					<div className="control__row">
-						<select value={easing} onChange={e => setEasing(e.target.value)}>
+						<select value={easing} onChange={e => { setEasing(e.target.value); }}>
 							<option value="ease">ease</option>
 							<option value="ease-in">ease-in</option>
 							<option value="ease-out">ease-out</option>
