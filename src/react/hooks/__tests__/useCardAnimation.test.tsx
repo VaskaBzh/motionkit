@@ -94,6 +94,7 @@ describe('useCardAnimation', () => {
 		await act(async () => { await result.current.animateMove([el]); });
 
 		expect(result.current.isAnimating).toBe(false);
+		// eslint-disable-next-line @typescript-eslint/unbound-method
 		expect(el.animate).not.toHaveBeenCalled();
 	});
 });

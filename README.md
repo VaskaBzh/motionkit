@@ -92,6 +92,8 @@ function MyList() {
 | Раздел | Описание |
 |--------|---------|
 | [Начало работы](docs/getting-started.md) | Установка, настройка, первые шаги |
+| [Vue 3](docs/vue.md) | Composable `useCardAnimation`, FLIP-паттерн, примеры |
+| [React](docs/react.md) | Хук `useCardAnimation`, FLIP-паттерн, примеры |
 | [API Reference](docs/api.md) | Классы, методы, типы |
 | [Архитектура](docs/architecture.md) | Структура проекта, расширение библиотеки |
 | [Contributing](docs/contributing.md) | Как участвовать в разработке |
