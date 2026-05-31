@@ -1,52 +1,52 @@
-[← Архитектура](architecture.md) · [Back to README](../README.md)
+[← Architecture](architecture.md) · [Back to README](../README.md)
 
 # Contributing
 
-## Настройка среды разработки
+## Development Setup
 
-### Требования
+### Requirements
 
 - Node.js 22+
 - npm 10+
 
-### Установка зависимостей
+### Install Dependencies
 
 ```bash
 npm install
 ```
 
-### Команды
+### Commands
 
-| Команда | Описание |
-|---------|---------|
-| `npm run dev` | Запускает dev-сервер Vite (для sandbox/demo) |
-| `npm run build` | Сборка библиотеки в `dist/` |
-| `npm run preview` | Предпросмотр собранного приложения |
-| `npm run lint` | ESLint проверка `src/` |
-| `npm run typecheck` | TypeScript проверка без emit (`tsc --noEmit`) |
-| `npm test` | Запускает все unit-тесты (Vitest) |
-| `npm run test:coverage` | Тесты с отчётом о покрытии |
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start the Vite dev server (sandbox/demo) |
+| `npm run build` | Build the library into `dist/` |
+| `npm run preview` | Preview the built output |
+| `npm run lint` | ESLint check on `src/` |
+| `npm run typecheck` | TypeScript check without emit (`tsc --noEmit`) |
+| `npm test` | Run all unit tests (Vitest) |
+| `npm run test:coverage` | Run tests with coverage report |
 
-## Структура проекта
+## Project Structure
 
-Перед тем как вносить изменения, изучи [Архитектуру](architecture.md).
+Before making changes, read the [Architecture](architecture.md) guide.
 
-Ключевые правила:
-- `src/core/` — только Web APIs, никаких фреймворк-импортов
-- Импорты файлов с расширением `.ts` (не `.js`)
-- При импорте из директории — только путь к папке (`'../types'`, не `'../types/index.ts'`)
-- Нативные `#` private fields (не TypeScript `private`)
-- `override` ключевое слово при переопределении методов
+Key rules:
+- `src/core/` — Web APIs only, no framework imports
+- Imports with `.ts` extension (not `.js`)
+- Directory imports — folder path only (`'../types'`, not `'../types/index.ts'`)
+- Native `#` private fields (not TypeScript `private`)
+- `override` keyword when overriding methods
 
-## Добавление фич
+## Adding Features
 
-1. **Новый тип анимации** → создай в `src/core/src/animations/`, наследуй `BaseAnimation` из `base/`
-2. **Новый фреймворк-биндинг** → создай `src/<framework>/`, импортируй только из `core/`
-3. **Изменение builder API** → обнови `AnimationBuilder.ts` и типы в `types/`
+1. **New animation type** → create in `src/core/src/animations/`, extend `BaseAnimation` from `base/`
+2. **New framework binding** → create `src/<framework>/`, import only from `core/`
+3. **Builder API change** → update `AnimationBuilder.ts` and types in `types/`
 
 ## TypeScript
 
-Проект использует строгий режим TypeScript:
+The project uses strict TypeScript mode:
 
 ```json
 "strict": true,
@@ -56,19 +56,19 @@ npm install
 "noUnusedParameters": true
 ```
 
-## Проверка кода
+## Code Checks
 
 ```bash
-# Тип-проверка
+# Type check
 npm run typecheck
 
-# Линтинг
+# Lint
 npm run lint
 ```
 
-## Тестирование
+## Testing
 
-Проект использует [Vitest](https://vitest.dev/). Тесты расположены рядом с исходниками:
+The project uses [Vitest](https://vitest.dev/). Tests live next to their source files:
 
 ```
 src/
@@ -79,17 +79,21 @@ src/
 ```
 
 ```bash
-# Запустить все тесты
+# Run all tests
 npm test
 
-# Запустить с покрытием
+# Run with coverage
 npm run test:coverage
 
-# Watch-режим при разработке
+# Watch mode during development
 npm run test:watch
 ```
 
+## CHANGELOG
+
+Every PR to `develop` or `master` must update `CHANGELOG.md` under `[Unreleased]`.
+
 ## See Also
 
-- [Архитектура](architecture.md) — паттерны и правила зависимостей
-- [API Reference](api.md) — документация по публичному API
+- [Architecture](architecture.md) — patterns and dependency rules
+- [API Reference](api.md) — public API documentation

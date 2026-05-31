@@ -1,65 +1,65 @@
 [Back to README](../README.md) · [API Reference →](api.md)
 
-# Начало работы
+# Getting Started
 
-## Требования
+## Requirements
 
-- Браузер с поддержкой [Web Animations API](https://caniuse.com/web-animations) (Chrome 84+, Firefox 75+, Safari 14+)
-- TypeScript 5+ (опционально, библиотека поставляется с `.d.ts`)
+- Browser with [Web Animations API](https://caniuse.com/web-animations) support (Chrome 84+, Firefox 75+, Safari 14+)
+- TypeScript 5+ (optional — the library ships with `.d.ts` files)
 
-## Установка
+## Installation
 
 ```bash
 npm install @motionlab/motionkit
-# или
+# or
 yarn add @motionlab/motionkit
-# или
+# or
 pnpm add @motionlab/motionkit
 ```
 
 ## Vanilla TypeScript / JavaScript
 
-Импортируй из core-модуля:
+Import from the core module:
 
 ```typescript
 import { AnimationBuilder } from '@motionlab/motionkit/core';
 ```
 
-### Базовый пример
+### Basic Example
 
 ```typescript
 const cards = document.querySelectorAll<HTMLElement>('.card');
 
 const builder = new AnimationBuilder()
-  .withDuration(300)       // длительность в мс (по умолчанию 300)
-  .withEasing('ease')      // CSS-функция плавности
-  .withStagger(0);         // задержка между карточками в мс
+  .withDuration(300)       // duration in ms (default: 300)
+  .withEasing('ease')      // CSS easing function
+  .withStagger(0);         // delay between cards in ms
 
-// Шаг 1: сделай снимок ПЕРЕД изменением DOM
+// Step 1: snapshot BEFORE DOM change
 builder.snapshot(cards);
 
-// Шаг 2: измени порядок карточек в DOM
+// Step 2: reorder cards in the DOM
 shuffleCards();
 
-// Шаг 3: запусти анимацию ПОСЛЕ изменения DOM
+// Step 3: play animation AFTER DOM change
 const runner = builder.buildAnimation(cards);
 await runner.play();
 ```
 
-### С stagger-эффектом
+### With Stagger Effect
 
 ```typescript
 const builder = new AnimationBuilder()
   .withDuration(350)
   .withEasing('cubic-bezier(0.4, 0, 0.2, 1)')
-  .withStagger(30);   // каждая следующая карточка стартует на 30мс позже
+  .withStagger(30);   // each next card starts 30ms later
 
 builder.snapshot(cards);
-cards.sort(byNewOrder);  // изменяем порядок в DOM
+cards.sort(byNewOrder);  // reorder in DOM
 await builder.buildAnimation(cards).play();
 ```
 
-### Со своим классом анимации
+### With Custom Animation Class
 
 ```typescript
 import { AnimationBuilder, BaseAnimation } from '@motionlab/motionkit/core';
@@ -84,13 +84,13 @@ await runner.play();
 
 ## Vue 3
 
-Установи тот же пакет и импортируй из Vue-интеграции:
+Install the same package and import from the Vue integration:
 
 ```typescript
 import { useCardAnimation } from '@motionlab/motionkit/vue';
 ```
 
-### Использование в компоненте
+### Usage in a Component
 
 ```vue
 <script setup lang="ts">
@@ -104,10 +104,10 @@ const { snapshot, animateMove, isAnimating } = useCardAnimation({
 });
 
 async function onReorder() {
-  snapshot(cardRefs.value ?? []);   // снимок ДО изменения
-  items.value.reverse();            // меняем порядок реактивного массива
-  await nextTick();                 // ждём обновления DOM
-  await animateMove(cardRefs.value ?? []);  // анимируем
+  snapshot(cardRefs.value ?? []);   // snapshot BEFORE change
+  items.value.reverse();            // update reactive data
+  await nextTick();                 // wait for DOM update
+  await animateMove(cardRefs.value ?? []);  // play animation
 }
 </script>
 
@@ -120,21 +120,21 @@ async function onReorder() {
       class="card"
     >{{ item.label }}</div>
     <button :disabled="isAnimating" @click="onReorder">
-      Перемешать
+      Shuffle
     </button>
   </div>
 </template>
 ```
 
-## Проверка работы
+## Troubleshooting
 
-После запуска анимации карточки должны плавно переместиться на новые позиции. Если движения нет:
+After playing the animation, cards should smoothly move to their new positions. If nothing moves:
 
-1. Убедись, что `snapshot()` вызван **до** изменения DOM
-2. Убедись, что `buildAnimation()` вызван **после** изменения DOM (и после `nextTick()` во Vue)
-3. Проверь, что карточки действительно сдвинулись (библиотека анимирует только те, у которых `deltaX !== 0 || deltaY !== 0`)
+1. Make sure `snapshot()` is called **before** the DOM change
+2. Make sure `buildAnimation()` is called **after** the DOM change (and after `nextTick()` in Vue)
+3. Verify that the cards actually moved (the library only animates cards where `deltaX !== 0 || deltaY !== 0`)
 
-## Следующие шаги
+## Next Steps
 
-- [API Reference](api.md) — полная документация по классам и методам
-- [Архитектура](architecture.md) — структура библиотеки и как её расширять
+- [API Reference](api.md) — full documentation for all classes and methods
+- [Architecture](architecture.md) — library structure and how to extend it

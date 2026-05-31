@@ -1,42 +1,42 @@
-[← Начало работы](getting-started.md) · [Back to README](../README.md) · [Архитектура →](architecture.md)
+[← Getting Started](getting-started.md) · [Back to README](../README.md) · [Architecture →](architecture.md)
 
 # API Reference
 
 ## AnimationBuilder
 
-Главная точка входа. Fluent builder для настройки и запуска FLIP-анимаций.
+The main entry point. A fluent builder for configuring and playing FLIP animations.
 
 ```typescript
 import { AnimationBuilder } from '@motionlab/motionkit/core';
 ```
 
-### Конструктор
+### Constructor
 
 ```typescript
 new AnimationBuilder(calculator?: TrajectoryCalculator)
 ```
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|---------|
-| `calculator` | `TrajectoryCalculator` | `new TrajectoryCalculator()` | Кастомный калькулятор траекторий |
+| Parameter    | Type                  | Default                     | Description                  |
+|--------------|-----------------------|-----------------------------|------------------------------|
+| `calculator` | `TrajectoryCalculator` | `new TrajectoryCalculator()` | Custom trajectory calculator |
 
-### Методы настройки
+### Configuration Methods
 
-| Метод | Возвращает | Описание |
-|-------|-----------|---------|
-| `use(module: AnimationConstructor)` | `this` | Подключает пользовательский класс анимации (по умолчанию `CardMoveAnimation`) |
-| `withDuration(ms: number)` | `this` | Длительность анимации в мс (по умолчанию 300) |
-| `withEasing(easing: string)` | `this` | CSS-функция плавности (по умолчанию `'ease'`) |
-| `withStagger(ms: number)` | `this` | Задержка между соседними карточками в мс (по умолчанию 0) |
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `use(module: AnimationConstructor)` | `this` | Plug in a custom animation class (default: `CardMoveAnimation`) |
+| `withDuration(ms: number)` | `this` | Animation duration in ms (default: 300) |
+| `withEasing(easing: string)` | `this` | CSS easing function (default: `'ease'`) |
+| `withStagger(ms: number)` | `this` | Delay between adjacent cards in ms (default: 0) |
 
-### Методы pipeline
+### Pipeline Methods
 
-| Метод | Возвращает | Описание |
-|-------|-----------|---------|
-| `snapshot(cards: Iterable<HTMLElement>)` | `this` | Запоминает позиции карточек **до** изменения DOM |
-| `buildAnimation(cards: Iterable<HTMLElement>)` | `AnimationRunner` | Строит runner с FLIP-анимациями **после** изменения DOM |
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `snapshot(cards: Iterable<HTMLElement>)` | `this` | Records card positions **before** DOM change |
+| `buildAnimation(cards: Iterable<HTMLElement>)` | `AnimationRunner` | Builds a runner with FLIP animations **after** DOM change |
 
-### Пример
+### Example
 
 ```typescript
 const builder = new AnimationBuilder()
@@ -51,7 +51,7 @@ await builder.buildAnimation(cards).play();
 
 ### Plugin API — use()
 
-`use()` позволяет заменить встроенный `CardMoveAnimation` на любой класс, реализующий `BaseAnimation`:
+`use()` replaces the built-in `CardMoveAnimation` with any class that implements `BaseAnimation`:
 
 ```typescript
 import { AnimationBuilder, BaseAnimation } from '@motionlab/motionkit/core';
@@ -92,81 +92,81 @@ await runner.play();
 
 ## AnimationRunner
 
-Оркестратор: запускает набор анимаций параллельно.
+Orchestrator: plays a set of animations in parallel.
 
 ```typescript
 import { AnimationRunner } from '@motionlab/motionkit/core';
 ```
 
-> Обычно ты не создаёшь `AnimationRunner` напрямую — он возвращается из `builder.buildAnimation()`.
+> You typically don't create `AnimationRunner` directly — it is returned by `builder.buildAnimation()`.
 
-### Методы
+### Methods
 
-| Метод | Возвращает | Описание |
-|-------|-----------|---------|
-| `add(animation: BaseAnimation)` | `this` | Добавляет анимацию в очередь |
-| `play()` | `Promise<void>` | Запускает все анимации параллельно |
-| `reverse()` | `Promise<void>` | Воспроизводит все анимации в обратном порядке |
-| `clear()` | `this` | Очищает список анимаций |
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `add(animation: BaseAnimation)` | `this` | Adds an animation to the queue |
+| `play()` | `Promise<void>` | Plays all animations in parallel |
+| `reverse()` | `Promise<void>` | Plays all animations in reverse |
+| `clear()` | `this` | Clears the animation list |
 
 ---
 
 ## BaseAnimation
 
-Абстрактный базовый класс. Наследуй его для создания собственных анимаций.
+Abstract base class. Extend it to create your own animations.
 
 ```typescript
 import { BaseAnimation } from '@motionlab/motionkit/core';
 ```
 
-### Абстрактные методы
+### Abstract Methods
 
-| Метод | Возвращает | Описание |
-|-------|-----------|---------|
-| `play()` | `Promise<void>` | Воспроизведение анимации |
-| `reverse()` | `Promise<void>` | Обратное воспроизведение |
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `play()` | `Promise<void>` | Play the animation |
+| `reverse()` | `Promise<void>` | Play in reverse |
 
 ---
 
 ## TrajectoryCalculator
 
-Вычисляет смещения карточек по технике FLIP.
+Calculates card offsets using the FLIP technique.
 
 ```typescript
 import { TrajectoryCalculator } from '@motionlab/motionkit/core';
 ```
 
-### Методы
+### Methods
 
-| Метод | Возвращает | Описание |
-|-------|-----------|---------|
-| `before(cards: Iterable<HTMLElement>)` | `this` | Запоминает позиции (**шаг First**) |
-| `calculate(cards: Iterable<HTMLElement>)` | `Trajectory[]` | Вычисляет дельты (**шаг Invert**) |
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `before(cards: Iterable<HTMLElement>)` | `this` | Records positions (**First** step) |
+| `calculate(cards: Iterable<HTMLElement>)` | `Trajectory[]` | Computes deltas (**Invert** step) |
 
-> Возвращает только те карточки, у которых `deltaX !== 0 || deltaY !== 0`.
+> Returns only cards where `deltaX !== 0 || deltaY !== 0`.
 
 ---
 
 ## CardMoveAnimation
 
-Исполнитель FLIP-анимации для одной карточки через Web Animations API.
+FLIP animation executor for a single card via the Web Animations API.
 
 ```typescript
 import { CardMoveAnimation } from '@motionlab/motionkit/core';
 ```
 
-### Конструктор
+### Constructor
 
 ```typescript
 new CardMoveAnimation(element: HTMLElement, trajectory: Trajectory, options?: CardMoveOptions)
 ```
 
-### Методы
+### Methods
 
-| Метод | Возвращает | Описание |
-|-------|-----------|---------|
-| `play()` | `Promise<void>` | Анимирует карточку из старой позиции в новую |
-| `reverse()` | `Promise<void>` | Анимирует в обратном направлении |
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `play()` | `Promise<void>` | Animates the card from its old position to the new one |
+| `reverse()` | `Promise<void>` | Animates in the reverse direction |
 
 ---
 
@@ -176,56 +176,56 @@ new CardMoveAnimation(element: HTMLElement, trajectory: Trajectory, options?: Ca
 import { useCardAnimation } from '@motionlab/motionkit/vue';
 ```
 
-### Сигнатура
+### Signature
 
 ```typescript
 function useCardAnimation(options?: CardAnimationComposableOptions): UseCardAnimationReturn
 ```
 
-### Опции
+### Options
 
-| Параметр | Тип | По умолчанию | Описание |
-|----------|-----|-------------|---------|
-| `duration` | `number` | `300` | Длительность анимации в мс |
-| `easing` | `string` | `'ease'` | CSS-функция плавности |
-| `delay` | `number` | `0` | Задержка старта в мс |
-| `stagger` | `number` | `0` | Задержка между карточками в мс |
+| Parameter  | Type     | Default  | Description                        |
+|------------|----------|----------|------------------------------------|
+| `duration` | `number` | `300`    | Animation duration in ms           |
+| `easing`   | `string` | `'ease'` | CSS easing function                |
+| `delay`    | `number` | `0`      | Start delay in ms                  |
+| `stagger`  | `number` | `0`      | Delay between cards in ms          |
 
-### Возвращаемые значения
+### Return Values
 
-| Поле | Тип | Описание |
-|------|-----|---------|
-| `snapshot` | `(cards: Iterable<HTMLElement>) => void` | Делает снимок позиций до изменения DOM |
-| `animateMove` | `(cards: Iterable<HTMLElement>) => Promise<void>` | Запускает анимацию после изменения DOM |
-| `isAnimating` | `Ref<boolean>` | Реактивный флаг активной анимации |
+| Field         | Type                                              | Description                                  |
+|---------------|---------------------------------------------------|----------------------------------------------|
+| `snapshot`    | `(cards: Iterable<HTMLElement>) => void`          | Records positions before DOM change          |
+| `animateMove` | `(cards: Iterable<HTMLElement>) => Promise<void>` | Plays animation after DOM change             |
+| `isAnimating` | `Ref<boolean>`                                    | Reactive flag — `true` while animating       |
 
 ---
 
-## Типы
+## Types
 
 ```typescript
-/** Вычисленное смещение одной карточки (результат FLIP-расчёта). */
+/** Computed offset for a single card (result of the FLIP calculation). */
 interface Trajectory {
   element: HTMLElement;
-  deltaX: number;  // горизонтальное смещение в пикселях
-  deltaY: number;  // вертикальное смещение в пикселях
+  deltaX: number;  // horizontal offset in pixels
+  deltaY: number;  // vertical offset in pixels
 }
 
-/** Опции анимации для отдельной карточки. */
+/** Per-card animation options. */
 interface CardMoveOptions {
-  duration?: number;  // мс, по умолчанию 300
-  easing?: string;    // CSS-функция, по умолчанию 'ease'
-  delay?: number;     // мс, по умолчанию 0
+  duration?: number;  // ms, default 300
+  easing?: string;    // CSS function, default 'ease'
+  delay?: number;     // ms, default 0
 }
 
-/** Итоговая конфигурация builder-а. */
+/** Final builder configuration. */
 interface BuilderConfig {
   duration: number;
   easing: string;
-  stagger: number;  // задержка между соседними карточками
+  stagger: number;  // delay between adjacent cards
 }
 
-/** Конструктор пользовательского класса анимации для use(). */
+/** Constructor signature for a custom animation class passed to use(). */
 interface AnimationConstructor {
   new(element: HTMLElement, trajectory: Trajectory, options?: CardMoveOptions): BaseAnimation;
 }
@@ -233,5 +233,5 @@ interface AnimationConstructor {
 
 ## See Also
 
-- [Начало работы](getting-started.md) — установка и базовые примеры
-- [Архитектура](architecture.md) — как добавить новый тип анимации
+- [Getting Started](getting-started.md) — installation and basic examples
+- [Architecture](architecture.md) — how to add a new animation type

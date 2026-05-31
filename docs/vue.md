@@ -1,8 +1,10 @@
-# Vue 3 integration
+[Back to README](../README.md) · [API Reference →](api.md)
 
-`@motionlab/motionkit/vue` предоставляет composable `useCardAnimation` для Vue 3 — тонкую обёртку над core FLIP-движком с реактивным флагом `isAnimating`.
+# Vue 3 Integration
 
-## Установка
+`@motionlab/motionkit/vue` provides the `useCardAnimation` composable for Vue 3 — a thin wrapper around the core FLIP engine with a reactive `isAnimating` flag.
+
+## Installation
 
 ```bash
 npm install @motionlab/motionkit vue
@@ -18,25 +20,25 @@ import { useCardAnimation } from '@motionlab/motionkit/vue';
 const { snapshot, animateMove, isAnimating } = useCardAnimation(options);
 ```
 
-**Параметры `CardAnimationComposableOptions`:**
+**`CardAnimationComposableOptions` parameters:**
 
-| Параметр   | Тип      | По умолчанию | Описание                              |
-|------------|----------|--------------|---------------------------------------|
-| `duration` | `number` | `300`        | Длительность анимации в мс            |
-| `easing`   | `string` | `'ease'`     | CSS-функция плавности                 |
-| `stagger`  | `number` | `0`          | Задержка между соседними карточками   |
+| Parameter  | Type     | Default  | Description                        |
+|------------|----------|----------|------------------------------------|
+| `duration` | `number` | `300`    | Animation duration in ms           |
+| `easing`   | `string` | `'ease'` | CSS easing function                |
+| `stagger`  | `number` | `0`      | Delay between adjacent cards in ms |
 
-**Возвращает `UseCardAnimationReturn`:**
+**Returns `UseCardAnimationReturn`:**
 
-| Поле          | Тип                                              | Описание                                 |
-|---------------|--------------------------------------------------|------------------------------------------|
-| `snapshot`    | `(cards: Iterable<HTMLElement>) => void`         | Запоминает позиции до изменения DOM      |
-| `animateMove` | `(cards: Iterable<HTMLElement>) => Promise<void>`| Запускает FLIP-анимацию после DOM-смены  |
-| `isAnimating` | `Ref<boolean>`                                   | `true` пока идёт анимация                |
+| Field         | Type                                              | Description                                    |
+|---------------|---------------------------------------------------|------------------------------------------------|
+| `snapshot`    | `(cards: Iterable<HTMLElement>) => void`          | Records positions before DOM change            |
+| `animateMove` | `(cards: Iterable<HTMLElement>) => Promise<void>` | Plays FLIP animation after DOM change          |
+| `isAnimating` | `Ref<boolean>`                                    | `true` while animation is running              |
 
-> `isAnimating` — реактивный `Ref<boolean>`. Используй `.value` в `<script setup>` и напрямую в шаблоне.
+> `isAnimating` is a reactive `Ref<boolean>`. Use `.value` in `<script setup>` and directly in the template.
 
-## FLIP-паттерн в Vue 3
+## FLIP Pattern in Vue 3
 
 ```vue
 <script setup lang="ts">
@@ -52,19 +54,19 @@ const { snapshot, animateMove, isAnimating } = useCardAnimation({
 });
 
 async function onReorder() {
-  // 1. Снимок позиций ДО изменения DOM
+  // 1. Snapshot positions BEFORE DOM change
   snapshot(cardEls.value ?? []);
-  // 2. Изменяем реактивные данные → Vue обновит DOM
+  // 2. Update reactive data → Vue will update the DOM
   cards.value = reorder(cards.value);
-  // 3. Ждём следующий тик — DOM уже обновлён
+  // 3. Wait for the next tick — DOM is now updated
   await nextTick();
-  // 4. Запускаем анимацию
+  // 4. Play animation
   await animateMove(cardEls.value ?? []);
 }
 </script>
 
 <template>
-  <button :disabled="isAnimating" @click="onReorder">Перемешать</button>
+  <button :disabled="isAnimating" @click="onReorder">Shuffle</button>
   <div class="card-grid">
     <div v-for="card in cards" :key="card.id" ref="cards" class="card">
       {{ card.title }}
@@ -73,7 +75,7 @@ async function onReorder() {
 </template>
 ```
 
-## Пример: ShuffleDemo
+## Example: ShuffleDemo
 
 ```vue
 <script setup lang="ts">
@@ -83,9 +85,9 @@ import { useCardAnimation } from '@motionlab/motionkit/vue';
 interface Card { id: number; title: string; color: string }
 
 const cards = ref<Card[]>([
-  { id: 1, title: 'Карточка A', color: '#ef4444' },
-  { id: 2, title: 'Карточка B', color: '#f97316' },
-  { id: 3, title: 'Карточка C', color: '#22c55e' },
+  { id: 1, title: 'Card A', color: '#ef4444' },
+  { id: 2, title: 'Card B', color: '#f97316' },
+  { id: 3, title: 'Card C', color: '#22c55e' },
 ]);
 
 const cardEls = useTemplateRef<HTMLElement[]>('cards');
@@ -108,7 +110,7 @@ async function shuffle() {
 
 <template>
   <button :disabled="isAnimating" @click="shuffle">
-    {{ isAnimating ? 'Анимация…' : 'Перемешать' }}
+    {{ isAnimating ? 'Animating…' : 'Shuffle' }}
   </button>
   <div class="card-grid">
     <div
@@ -124,13 +126,13 @@ async function shuffle() {
 </template>
 ```
 
-## Отличия от React
+## Differences from React
 
-| Аспект | Vue 3 | React |
-|---|---|---|
-| `isAnimating` | `Ref<boolean>` (`.value`) | `boolean` (напрямую) |
-| После DOM-изменения | `await nextTick()` | `useEffect([cards])` |
-| Привязка элементов | `useTemplateRef` / `ref="cards"` | `useRef` + callback ref |
-| Стабильность builder | создаётся один раз в `setup` | `useRef(new AnimationBuilder())` |
+| Aspect             | Vue 3                              | React                          |
+|--------------------|------------------------------------|--------------------------------|
+| `isAnimating`      | `Ref<boolean>` (`.value`)          | `boolean` (direct)             |
+| After DOM change   | `await nextTick()`                 | `useEffect([cards])`           |
+| Element binding    | `useTemplateRef` / `ref="cards"`   | `useRef` + callback ref        |
+| Builder stability  | created once in `setup`            | `useRef(new AnimationBuilder())`|
 
-Подробнее о React-варианте: [docs/react.md](react.md)
+See the React variant: [docs/react.md](react.md)
