@@ -40,6 +40,11 @@
       "import": "./dist/react.js",
       "require": "./dist/react.cjs",
       "types": "./dist/react/index.d.ts"
+    },
+    "./angular": {
+      "import": "./dist/angular.js",
+      "require": "./dist/angular.cjs",
+      "types": "./dist/angular/index.d.ts"
     }
   },
   "main": "./dist/core.cjs",
@@ -52,13 +57,15 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "dev:angular": "vite --config vite.demo.angular.config.ts",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "vue": "^3.0.0",
+    "@angular/core": "^17.0.0",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react-dom": "^18.0.0",
+    "vue": "^3.0.0"
   },
   "peerDependenciesMeta": {
     "vue": {
@@ -69,10 +76,22 @@
     },
     "react-dom": {
       "optional": true
+    },
+    "@angular/core": {
+      "optional": true
     }
   },
   "devDependencies": {
+    "@analogjs/vite-plugin-angular": "^2.5.2",
+    "@angular/animations": "^21.2.14",
+    "@angular/build": "^21.2.12",
+    "@angular/common": "^21.2.14",
+    "@angular/compiler": "^21.2.14",
+    "@angular/compiler-cli": "^21.2.14",
+    "@angular/core": "^21.2.14",
+    "@angular/platform-browser": "^21.2.14",
     "@eslint/js": "^10.0.1",
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
@@ -89,6 +108,7 @@
     "vite": "^8.0.12",
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.1.6",
-    "vue": "^3.5.34"
+    "vue": "^3.5.34",
+    "zone.js": "^0.15.1"
   }
 }

@@ -231,7 +231,83 @@ interface AnimationConstructor {
 }
 ```
 
+---
+
+## Angular — CardAnimationService
+
+```typescript
+import { CardAnimationService } from '@motionlab/motionkit/angular';
+```
+
+Подключается через `providers: [CardAnimationService]` в декораторе компонента — каждый компонент получает независимый экземпляр.
+
+### Свойства
+
+| Свойство | Тип | Описание |
+|----------|-----|---------|
+| `isAnimating` | `Signal<boolean>` | `true` пока идёт анимация. Читать как `isAnimating()` |
+
+### Методы
+
+| Метод | Возвращает | Описание |
+|-------|-----------|---------|
+| `configure(options)` | `void` | Применяет опции анимации (duration, easing, stagger) |
+| `snapshot(cards)` | `void` | Снимок позиций **до** изменения DOM (шаг First) |
+| `animateMove(cards)` | `Promise<void>` | Анимирует после изменения DOM (шаги Last→Invert→Play) |
+| `animate(getElements, updateState)` | `Promise<void>` | **Высокоуровневый:** делает всё сам — снимок, ожидание render, анимация |
+
+### `configure(options)`
+
+```typescript
+configure(options: {
+  duration?: number;  // мс, по умолчанию 300
+  easing?: string;    // CSS-функция, по умолчанию 'ease'
+  stagger?: number;   // задержка между карточками в мс, по умолчанию 0
+}): void
+```
+
+### `animate(getElements, updateState)` ✨
+
+```typescript
+animate(
+  getElements: () => Iterable<HTMLElement>,
+  updateState: () => void,
+): Promise<void>
+```
+
+Высокоуровневый метод. Управляет полным FLIP-циклом: снимает позиции, вызывает `updateState`, ждёт Angular render (фаза `read`), затем анимирует.
+
+`getElements` вызывается **дважды**: до `updateState` (снимок «до») и после render (элементы «после»).
+
+> Требует Angular DI-контекста. Если сервис создан вне `providers:` — бросает `Error`.
+> Если вызван во время активной анимации — выводит `console.warn` и завершается без эффекта.
+
+**Пример:**
+
+```typescript
+await this.anim.animate(
+  () => this.cardEls().map(r => r.nativeElement),
+  () => this.cards.update(arr => shuffleArr(arr)),
+);
+```
+
+### `snapshot(cards)` + `animateMove(cards)` — ручной контроль
+
+Низкоуровневый API для нестандартных сценариев или ванильного JS:
+
+```typescript
+this.anim.snapshot(elements);
+updateYourData();
+// ... вручную ждёте render-цикл (например через afterNextRender) ...
+await this.anim.animateMove(newElements);
+```
+
+> Подробнее о ручном подходе — [docs/angular.md](angular.md).
+
+---
+
 ## See Also
 
 - [Начало работы](getting-started.md) — установка и базовые примеры
+- [Angular интеграция](angular.md) — полное руководство по `CardAnimationService`
 - [Архитектура](architecture.md) — как добавить новый тип анимации
