@@ -12,7 +12,7 @@ import type { CardAnimationHookOptions, UseCardAnimationReturn } from '../types'
  *
  * async function onReorder() {
  *   snapshot(cardRefs.current);
- *   // изменяем порядок в состоянии...
+ *   // reorder state...
  *   await animateMove(cardRefs.current);
  * }
  * ```
