@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>motion.js · Vanilla demo</title>
+  </head>
+  <body>
+    <div class="demo-layout">
+      <header class="demo-header">
+        <h1><a href="./index.html">motion<span>.js</span></a> Vanilla demo</h1>
+        <nav class="tabs">
+          <button class="tab-btn tab-btn--active" data-tab="shuffle">Shuffle</button>
+          <button class="tab-btn" data-tab="dynamic">Dynamic</button>
+        </nav>
+      </header>
+
+      <section id="tab-shuffle">
+        <div class="controls">
+          <label class="control">
+            <span class="control__label">duration</span>
+            <div class="control__row">
+              <input id="s-duration" type="range" min="100" max="3000" step="50" value="500" />
+              <span id="s-duration-val" class="control__value">500ms</span>
+            </div>
+          </label>
+          <label class="control">
+            <span class="control__label">stagger</span>
+            <div class="control__row">
+              <input id="s-stagger" type="range" min="0" max="300" step="10" value="30" />
+              <span id="s-stagger-val" class="control__value">30ms</span>
+            </div>
+          </label>
+          <label class="control">
+            <span class="control__label">easing</span>
+            <div class="control__row">
+              <select id="s-easing">
+                <option value="ease">ease</option>
+                <option value="ease-in">ease-in</option>
+                <option value="ease-out">ease-out</option>
+                <option value="ease-in-out">ease-in-out</option>
+                <option value="linear">linear</option>
+                <option value="cubic-bezier(0.34, 1.56, 0.64, 1)">spring</option>
+              </select>
+            </div>
+          </label>
+          <button id="s-shuffle" class="btn-shuffle">Перемешать</button>
+        </div>
+        <div id="s-grid" class="card-grid"></div>
+      </section>
+
+      <section id="tab-dynamic" hidden>
+        <div class="dynamic-actions">
+          <button id="d-add-start" class="btn-action">+ в начало</button>
+          <button id="d-add-end" class="btn-action">+ в конец</button>
+          <button id="d-add-mid" class="btn-action">+ в середину</button>
+          <button id="d-remove-first" class="btn-action">− первую</button>
+          <button id="d-remove-last" class="btn-action">− последнюю</button>
+          <span id="d-counter" class="card-counter"></span>
+        </div>
+        <div id="d-grid" class="card-grid"></div>
+      </section>
+    </div>
+
+    <template id="card-tpl">
+      <div class="card">
+        <span class="card__title"></span>
+        <span class="card__id"></span>
+      </div>
+    </template>
+
+    <script type="module" src="/demo-vanilla/main.ts"></script>
+  </body>
+</html>
