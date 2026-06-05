@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, signal, viewChildren } from '@angular/core';
+import { Component, ElementRef, Injector, afterNextRender, inject, signal, viewChildren } from '@angular/core';
 import { CardAnimationService } from '../src/angular';
 
 interface Card {
@@ -43,6 +43,7 @@ const INITIAL_CARDS: Card[] = [
 })
 export class DynamicDemoComponent {
 	protected readonly anim = inject(CardAnimationService);
+	readonly #injector = inject(Injector);
 
 	readonly cards = signal<Card[]>([...INITIAL_CARDS]);
 	readonly cardEls = viewChildren<ElementRef<HTMLElement>>('cardEl');
@@ -54,18 +55,22 @@ export class DynamicDemoComponent {
 		const color = COLORS[id % COLORS.length]!;
 		const title = TITLES[id % TITLES.length]!;
 
-		await this.anim.animate(
-			() => this.cardEls().map(r => r.nativeElement),
-			() => this.cards.update(arr => [...arr, { id, title, color }]),
+		this.anim.snapshot(this.cardEls().map(r => r.nativeElement));
+		this.cards.update(arr => [...arr, { id, title, color }]);
+		await new Promise<void>(resolve =>
+			afterNextRender({ read: resolve }, { injector: this.#injector }),
 		);
+		await this.anim.animateMove(this.cardEls().map(r => r.nativeElement));
 	}
 
 	async removeCard(): Promise<void> {
 		if (this.cards().length === 0) return;
 
-		await this.anim.animate(
-			() => this.cardEls().map(r => r.nativeElement),
-			() => this.cards.update(arr => arr.slice(0, -1)),
+		this.anim.snapshot(this.cardEls().map(r => r.nativeElement));
+		this.cards.update(arr => arr.slice(0, -1));
+		await new Promise<void>(resolve =>
+			afterNextRender({ read: resolve }, { injector: this.#injector }),
 		);
+		await this.anim.animateMove(this.cardEls().map(r => r.nativeElement));
 	}
 }

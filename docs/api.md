@@ -254,7 +254,6 @@ import { CardAnimationService } from '@motionlab/motionkit/angular';
 | `configure(options)` | `void` | Применяет опции анимации (duration, easing, stagger) |
 | `snapshot(cards)` | `void` | Снимок позиций **до** изменения DOM (шаг First) |
 | `animateMove(cards)` | `Promise<void>` | Анимирует после изменения DOM (шаги Last→Invert→Play) |
-| `animate(getElements, updateState)` | `Promise<void>` | **Высокоуровневый:** делает всё сам — снимок, ожидание render, анимация |
 
 ### `configure(options)`
 
@@ -266,43 +265,25 @@ configure(options: {
 }): void
 ```
 
-### `animate(getElements, updateState)` ✨
+### `snapshot(cards)` + `animateMove(cards)`
 
 ```typescript
-animate(
-  getElements: () => Iterable<HTMLElement>,
-  updateState: () => void,
-): Promise<void>
-```
-
-Высокоуровневый метод. Управляет полным FLIP-циклом: снимает позиции, вызывает `updateState`, ждёт Angular render (фаза `read`), затем анимирует.
-
-`getElements` вызывается **дважды**: до `updateState` (снимок «до») и после render (элементы «после»).
-
-> Требует Angular DI-контекста. Если сервис создан вне `providers:` — бросает `Error`.
-> Если вызван во время активной анимации — выводит `console.warn` и завершается без эффекта.
-
-**Пример:**
-
-```typescript
-await this.anim.animate(
-  () => this.cardEls().map(r => r.nativeElement),
-  () => this.cards.update(arr => shuffleArr(arr)),
-);
-```
-
-### `snapshot(cards)` + `animateMove(cards)` — ручной контроль
-
-Низкоуровневый API для нестандартных сценариев или ванильного JS:
-
-```typescript
+// 1. Снимок позиций до изменения
 this.anim.snapshot(elements);
-updateYourData();
-// ... вручную ждёте render-цикл (например через afterNextRender) ...
-await this.anim.animateMove(newElements);
+
+// 2. Изменяем данные
+this.cards.update(arr => shuffleArr(arr));
+
+// 3. Ждём Angular render-цикл
+await new Promise<void>(resolve =>
+  afterNextRender({ read: resolve }, { injector: this.injector }),
+);
+
+// 4. Запускаем анимацию
+await this.anim.animateMove(elements);
 ```
 
-> Подробнее о ручном подходе — [docs/angular.md](angular.md).
+> Подробное руководство — [docs/angular.md](angular.md).
 
 ---
 

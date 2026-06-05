@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, signal, viewChildren } from '@angular/core';
+import { Component, ElementRef, Injector, afterNextRender, inject, signal, viewChildren } from '@angular/core';
 import { CardAnimationService } from '../src/angular';
 
 interface Card {
@@ -71,6 +71,7 @@ const INITIAL_CARDS: Card[] = [
 })
 export class ShuffleDemoComponent {
 	protected readonly anim = inject(CardAnimationService);
+	readonly #injector = inject(Injector);
 
 	readonly cards = signal<Card[]>([...INITIAL_CARDS]);
 	readonly duration = signal(500);
@@ -86,16 +87,18 @@ export class ShuffleDemoComponent {
 			easing: this.easing(),
 		});
 
-		await this.anim.animate(
-			() => this.cardEls().map(r => r.nativeElement),
-			() => this.cards.update(arr => {
-				const copy = [...arr];
-				for (let i = copy.length - 1; i > 0; i--) {
-					const j = Math.floor(Math.random() * (i + 1));
-					[copy[i], copy[j]] = [copy[j]!, copy[i]!];
-				}
-				return copy;
-			}),
+		this.anim.snapshot(this.cardEls().map(r => r.nativeElement));
+		this.cards.update(arr => {
+			const copy = [...arr];
+			for (let i = copy.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[copy[i], copy[j]] = [copy[j]!, copy[i]!];
+			}
+			return copy;
+		});
+		await new Promise<void>(resolve =>
+			afterNextRender({ read: resolve }, { injector: this.#injector }),
 		);
+		await this.anim.animateMove(this.cardEls().map(r => r.nativeElement));
 	}
 }

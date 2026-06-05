@@ -1,1 +1,1 @@
-export type { CardAnimationServiceOptions, CardAnimationServiceContract, NextRenderFn } from './service.ts';
+export type { CardAnimationServiceOptions, CardAnimationServiceContract } from './service.ts';
