@@ -80,8 +80,6 @@ export class ShuffleDemoComponent {
 	readonly cardEls = viewChildren<ElementRef<HTMLElement>>('cardEl');
 
 	async shuffle(): Promise<void> {
-		if (this.anim.isAnimating()) return;
-
 		this.anim.configure({
 			duration: this.duration(),
 			stagger: this.stagger(),

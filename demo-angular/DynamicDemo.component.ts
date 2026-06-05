@@ -1,4 +1,4 @@
-import { Component, ElementRef, Injector, afterNextRender, inject, signal, viewChildren } from '@angular/core';
+import { Component, ElementRef, inject, signal, viewChildren } from '@angular/core';
 import { CardAnimationService } from '../src/angular';
 
 interface Card {
@@ -9,8 +9,6 @@ interface Card {
 
 const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#a855f7', '#ec4899', '#14b8a6'];
 const TITLES = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta'];
-
-let nextId = 7;
 
 const INITIAL_CARDS: Card[] = [
 	{ id: 1, title: 'Alpha', color: '#ef4444' },
@@ -45,42 +43,29 @@ const INITIAL_CARDS: Card[] = [
 })
 export class DynamicDemoComponent {
 	protected readonly anim = inject(CardAnimationService);
-	private readonly injector = inject(Injector);
 
 	readonly cards = signal<Card[]>([...INITIAL_CARDS]);
 	readonly cardEls = viewChildren<ElementRef<HTMLElement>>('cardEl');
 
-	async addCard(): Promise<void> {
-		if (this.anim.isAnimating()) return;
+	#nextId = INITIAL_CARDS.length + 1;
 
-		const id = nextId++;
+	async addCard(): Promise<void> {
+		const id = this.#nextId++;
 		const color = COLORS[id % COLORS.length]!;
 		const title = TITLES[id % TITLES.length]!;
 
-		const elements = this.cardEls().map(r => r.nativeElement);
-		this.anim.snapshot(elements);
-
-		this.cards.update(arr => [...arr, { id, title, color }]);
-
-		await new Promise<void>(resolve => {
-			afterNextRender({ read: resolve }, { injector: this.injector });
-		});
-
-		await this.anim.animateMove(this.cardEls().map(r => r.nativeElement));
+		await this.anim.animate(
+			() => this.cardEls().map(r => r.nativeElement),
+			() => this.cards.update(arr => [...arr, { id, title, color }]),
+		);
 	}
 
 	async removeCard(): Promise<void> {
-		if (this.anim.isAnimating() || this.cards().length === 0) return;
+		if (this.cards().length === 0) return;
 
-		const elements = this.cardEls().map(r => r.nativeElement);
-		this.anim.snapshot(elements);
-
-		this.cards.update(arr => arr.slice(0, -1));
-
-		await new Promise<void>(resolve => {
-			afterNextRender({ read: resolve }, { injector: this.injector });
-		});
-
-		await this.anim.animateMove(this.cardEls().map(r => r.nativeElement));
+		await this.anim.animate(
+			() => this.cardEls().map(r => r.nativeElement),
+			() => this.cards.update(arr => arr.slice(0, -1)),
+		);
 	}
 }

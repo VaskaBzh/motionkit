@@ -1,4 +1,4 @@
-import { Injector, afterNextRender, inject, signal } from '@angular/core';
+import { Injectable, Injector, afterNextRender, inject, signal } from '@angular/core';
 import { AnimationBuilder } from '../../core/src';
 import type { CardAnimationServiceOptions, CardAnimationServiceContract, NextRenderFn } from '../types';
 
@@ -64,6 +64,7 @@ function captureInjector(): Injector | null {
  * const service = new CardAnimationService(() => Promise.resolve());
  * ```
  */
+@Injectable()
 export class CardAnimationService implements CardAnimationServiceContract {
 	readonly #builder = new AnimationBuilder();
 	readonly #injector: Injector | null;
@@ -100,15 +101,15 @@ export class CardAnimationService implements CardAnimationServiceContract {
 
 		this.animate = async (getElements, updateState): Promise<void> => {
 			if (this.isAnimating()) {
-				console.warn('[CardAnimationService] animate() вызван во время активной анимации — пропускаем');
+				console.warn('[CardAnimationService] animate() called while animation is active — skipping');
 				return;
 			}
 
 			const injector = this.#injector;
 			if (requiresInjector && !injector) {
 				throw new Error(
-					'[CardAnimationService] animate() требует Angular DI-контекста. ' +
-					'Добавьте providers: [CardAnimationService] в декоратор компонента.',
+					'[CardAnimationService] animate() requires an Angular DI context. ' +
+					'Add providers: [CardAnimationService] to the component decorator.',
 				);
 			}
 
