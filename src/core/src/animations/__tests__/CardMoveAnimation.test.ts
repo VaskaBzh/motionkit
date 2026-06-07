@@ -119,6 +119,44 @@ describe('CardMoveAnimation', () => {
 		expect(el.animate).toHaveBeenCalledTimes(2);
 	});
 
+	describe('prefers-reduced-motion', () => {
+		it('коллапсирует duration до 1 при prefers-reduced-motion: reduce', async () => {
+			vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: true }));
+
+			const anim = new CardMoveAnimation(el, makeTrajectory(el));
+			await anim.play();
+
+			const [, opts] = (el.animate as Mock).mock.calls[0] as [Keyframe[], KeyframeAnimationOptions];
+			expect(opts.duration).toBe(1);
+
+			vi.unstubAllGlobals();
+		});
+
+		it('не коллапсирует duration при prefers-reduced-motion: no-preference', async () => {
+			vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: false }));
+
+			const anim = new CardMoveAnimation(el, makeTrajectory(el), { duration: 400 });
+			await anim.play();
+
+			const [, opts] = (el.animate as Mock).mock.calls[0] as [Keyframe[], KeyframeAnimationOptions];
+			expect(opts.duration).toBe(400);
+
+			vi.unstubAllGlobals();
+		});
+
+		it('respectReducedMotion: false отключает учёт настройки', async () => {
+			vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: true }));
+
+			const anim = new CardMoveAnimation(el, makeTrajectory(el), { duration: 300, respectReducedMotion: false });
+			await anim.play();
+
+			const [, opts] = (el.animate as Mock).mock.calls[0] as [Keyframe[], KeyframeAnimationOptions];
+			expect(opts.duration).toBe(300);
+
+			vi.unstubAllGlobals();
+		});
+	});
+
 	it('play() отменяет предыдущую анимацию перед запуском новой', async () => {
 		const firstMock = makeAnimationMock();
 		const secondMock = makeAnimationMock();
