@@ -24,7 +24,7 @@ new AnimationBuilder(calculator?: TrajectoryCalculator)
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `use(module: AnimationConstructor)` | `this` | Plug in a custom animation class (default: `CardMoveAnimation`) |
+| `use(module: AnimationConstructor)` | `this` | Register the animation class to use (required before `buildAnimation()`) |
 | `withDuration(ms: number)` | `this` | Animation duration in ms (default: 300) |
 | `withEasing(easing: string)` | `this` | CSS easing function (default: `'ease'`) |
 | `withStagger(ms: number)` | `this` | Delay between adjacent cards in ms (default: 0) |
@@ -39,7 +39,10 @@ new AnimationBuilder(calculator?: TrajectoryCalculator)
 ### Example
 
 ```typescript
+import { AnimationBuilder, CardMoveAnimation } from '@motionlab/motionkit/core';
+
 const builder = new AnimationBuilder()
+  .use(CardMoveAnimation)
   .withDuration(400)
   .withEasing('cubic-bezier(0.25, 0.46, 0.45, 0.94)')
   .withStagger(25);
