@@ -77,7 +77,7 @@ describe('CardMoveAnimation', () => {
 
 		expect(nativeMock.reverse).toHaveBeenCalledOnce();
 		// eslint-disable-next-line @typescript-eslint/unbound-method
-		expect(el.animate).toHaveBeenCalledOnce(); // не вызывается повторно
+		expect(el.animate).toHaveBeenCalledOnce(); // not called again
 	});
 
 	it('reverse() без предыдущего play() запускает обратную анимацию через animate()', async () => {

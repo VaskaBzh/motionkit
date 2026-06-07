@@ -16,9 +16,9 @@ import type { BuilderConfig, AnimationConstructor } from '../types';
  *   .withEasing('cubic-bezier(0.4, 0, 0.2, 1)')
  *   .withStagger(30);
  *
- * builder.snapshot(cards);          // до изменения DOM
- * // ... изменяем DOM ...
- * await builder.buildAnimation(cards).play(); // после
+ * builder.snapshot(cards);          // before DOM change
+ * // ... change the DOM ...
+ * await builder.buildAnimation(cards).play(); // after
  * ```
  */
 export class AnimationBuilder {

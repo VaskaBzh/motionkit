@@ -1,76 +1,76 @@
 [← API Reference](api.md) · [Back to README](../README.md) · [Contributing →](contributing.md)
 
-# Архитектура
+# Architecture
 
-## Обзор
+## Overview
 
-`@motionlab/motionkit` использует **модульную архитектуру библиотеки**: фреймворк-нейтральный `core` и независимые биндинги для каждого фреймворка.
+`@motionlab/motionkit` uses a **modular library architecture**: a framework-neutral `core` and independent bindings for each framework.
 
 ```
 src/
-├── core/   ← Web APIs только, нулевые зависимости
-└── vue/    ← зависит от core + vue
+├── core/   ← Web APIs only, zero dependencies
+└── vue/    ← depends on core + vue
 ```
 
-Зависимости всегда направлены к `core`. Биндинги не зависят друг от друга.
+Dependencies always point toward `core`. Bindings do not depend on each other.
 
-## Структура файлов
+## File Structure
 
 ```
 src/
 ├── core/
-│   ├── index.ts                         # Публичный API: реэкспорт из src/
+│   ├── index.ts                         # Public API: re-exports from src/
 │   └── src/
-│       ├── index.ts                     # Публичный API core
+│       ├── index.ts                     # Core public API
 │       ├── base/
-│       │   └── BaseAnimation.ts         # Абстрактный контракт: play() / reverse()
+│       │   └── BaseAnimation.ts         # Abstract contract: play() / reverse()
 │       ├── animations/
-│       │   ├── AnimationRunner.ts       # Оркестратор параллельного запуска
-│       │   └── CardMoveAnimation.ts     # FLIP через Web Animations API
+│       │   ├── AnimationRunner.ts       # Parallel orchestrator
+│       │   └── CardMoveAnimation.ts     # FLIP via Web Animations API
 │       ├── builders/
-│       │   └── AnimationBuilder.ts      # Fluent builder (точка входа)
+│       │   └── AnimationBuilder.ts      # Fluent builder (entry point)
 │       ├── calculators/
-│       │   └── TrajectoryCalculator.ts  # FLIP-расчёт: before() → calculate()
+│       │   └── TrajectoryCalculator.ts  # FLIP calculation: before() → calculate()
 │       └── types/
-│           ├── index.ts                 # Реэкспорт всех типов
+│           ├── index.ts                 # Re-exports all types
 │           ├── animation.ts             # CardMoveOptions, BuilderConfig, AnimationConstructor
 │           └── trajectory.ts            # Trajectory
 └── vue/
-    ├── index.ts                         # Публичный API Vue-биндинга
+    ├── index.ts                         # Vue binding public API
     └── composables/
-        └── useCardAnimation.ts          # Composable с ref(isAnimating)
+        └── useCardAnimation.ts          # Composable with ref(isAnimating)
 ```
 
-## FLIP pipeline
+## FLIP Pipeline
 
 ```
 builder.snapshot(cards)
-  ↓  TrajectoryCalculator.before(cards)     ← First: запомнить позиции
-──── изменение DOM ────
+  ↓  TrajectoryCalculator.before(cards)     ← First: record positions
+──── DOM change ────
 builder.buildAnimation(cards)
-  ↓  TrajectoryCalculator.calculate(cards)  ← Last + Invert: вычислить дельты
-  ↓  для каждой сдвинувшейся карточки:
-  ↓  new AnimationClass(el, trajectory, options)   ← CardMoveAnimation или use()
+  ↓  TrajectoryCalculator.calculate(cards)  ← Last + Invert: compute deltas
+  ↓  for each card that moved:
+  ↓  new AnimationClass(el, trajectory, options)   ← CardMoveAnimation or use()
      AnimationRunner.add(animation)
 runner.play()
   ↓  animation.play()                       ← Play: Web Animations API
 ```
 
-## Правила зависимостей
+## Dependency Rules
 
 ```
           core/
-         (только Web APIs)
-              ↑
-            vue/
+      (Web APIs only)
+           ↑
+         vue/
 ```
 
 - ✅ `vue/` → `core/`
 - ❌ `core/` → `vue/`
 
-## Добавить новый тип анимации
+## Adding a New Animation Type
 
-### Вариант 1: через use() (без изменения библиотеки)
+### Option 1: via use() (no library changes needed)
 
 ```typescript
 import { AnimationBuilder, BaseAnimation } from '@motionlab/motionkit/core';
@@ -111,9 +111,9 @@ await new AnimationBuilder()
   .play();
 ```
 
-### Вариант 2: новый класс внутри библиотеки
+### Option 2: new class inside the library
 
-#### 1. Создай класс в `src/core/src/animations/`
+#### 1. Create the class in `src/core/src/animations/`
 
 ```typescript
 // src/core/src/animations/CardFadeAnimation.ts
@@ -121,17 +121,17 @@ import { BaseAnimation } from '../base/BaseAnimation.ts';
 import type { Trajectory, CardMoveOptions } from '../types';
 
 export class CardFadeAnimation extends BaseAnimation {
-  // ...реализация как выше
+  // ...implementation as above
 }
 ```
 
-#### 2. Экспортируй из `src/core/src/index.ts`
+#### 2. Export from `src/core/src/index.ts`
 
 ```typescript
 export { CardFadeAnimation } from './animations/CardFadeAnimation.ts';
 ```
 
-#### 3. Используй напрямую через AnimationRunner
+#### 3. Use directly via AnimationRunner
 
 ```typescript
 const runner = new AnimationRunner();
@@ -139,18 +139,18 @@ cards.forEach(el => runner.add(new CardFadeAnimation(el, { element: el, deltaX: 
 await runner.play();
 ```
 
-## Ключевые соглашения
+## Key Conventions
 
-| Соглашение | Правило |
-|-----------|---------|
-| Импорты файлов | С расширением `.ts` (ESM-only) |
-| Импорты директорий | Путь к папке без `index.ts` (`'../types'`, не `'../types/index.ts'`) |
-| Приватные поля | Нативные `#field`, не TypeScript `private` |
-| Fluent методы | Возвращают `this` |
-| Переопределение | Ключевое слово `override` обязательно |
-| Новые анимации | Наследуют `BaseAnimation` из `base/` |
+| Convention         | Rule                                                              |
+|--------------------|-------------------------------------------------------------------|
+| File imports       | With `.ts` extension (ESM-only)                                   |
+| Directory imports  | Folder path without `index.ts` (`'../types'`, not `'../types/index.ts'`) |
+| Private fields     | Native `#field`, not TypeScript `private`                         |
+| Fluent methods     | Return `this`                                                     |
+| Method override    | `override` keyword is mandatory                                   |
+| New animations     | Extend `BaseAnimation` from `base/`                               |
 
 ## See Also
 
-- [API Reference](api.md) — подробная документация по всем классам
-- [Contributing](contributing.md) — как запустить и протестировать проект
+- [API Reference](api.md) — detailed docs for all classes
+- [Contributing](contributing.md) — how to run and test the project

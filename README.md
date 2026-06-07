@@ -1,10 +1,10 @@
 # @motionlab/motionkit
 
-> Плавные FLIP-анимации карточек на TypeScript. Нулевые зависимости.
+> Smooth FLIP card animations in TypeScript. Zero dependencies.
 
-TypeScript-библиотека для анимации перестановки HTML-карточек на основе техники **FLIP** (First → Last → Invert → Play). Использует нативный Web Animations API — никаких runtime-зависимостей.
+A TypeScript library for animating HTML card reordering using the **FLIP** technique (First → Last → Invert → Play). Powered by the native Web Animations API — no runtime dependencies.
 
-## Быстрый старт
+## Quick Start
 
 ```bash
 npm install @motionlab/motionkit
@@ -18,26 +18,27 @@ const builder = new AnimationBuilder()
   .withEasing('cubic-bezier(0.4, 0, 0.2, 1)')
   .withStagger(30);
 
-// До изменения DOM
+// Before DOM change
 builder.snapshot(cards);
 
-// Изменяем порядок элементов...
+// Reorder elements...
 reorderCards();
 
-// После изменения DOM — запускаем анимацию
+// After DOM change — play animation
 await builder.buildAnimation(cards).play();
 ```
 
-## Ключевые возможности
+## Features
 
-- **FLIP-техника** — плавное движение карточек без layout thrashing
-- **Web Animations API** — нативный браузерный API, никаких зависимостей
-- **Fluent builder** — читаемый DSL для настройки анимаций
-- **Stagger** — волновой эффект задержек между карточками
-- **Plugin API** — подключи свой класс анимации через `.use()`
-- **Vue 3** — готовый composable `useCardAnimation`
-- **React** — хук `useCardAnimation` с поддержкой FLIP-паттерна
-- **TypeScript** — полная типизация из коробки
+- **FLIP technique** — smooth card movement without layout thrashing
+- **Web Animations API** — native browser API, no dependencies
+- **Fluent builder** — readable DSL for animation configuration
+- **Stagger** — wave delay effect between cards
+- **Plugin API** — plug in your own animation class via `.use()`
+- **Vue 3** — ready-to-use composable `useCardAnimation`
+- **React** — hook `useCardAnimation` with FLIP pattern support
+- **Angular** — `CardAnimationService` with Angular Signals and DI
+- **TypeScript** — full typings out of the box
 
 ## Vue 3
 
@@ -83,21 +84,45 @@ function MyList() {
 }
 ```
 
-Открыть React demo: [react.html](react.html)
+## Angular
+
+```typescript
+import { CardAnimationService } from '@motionlab/motionkit/angular';
+
+@Component({
+  providers: [CardAnimationService],
+})
+export class MyComponent {
+  private anim = inject(CardAnimationService);
+
+  async shuffle() {
+    await this.anim.animate(
+      () => this.cardEls().map(r => r.nativeElement),
+      () => this.cards.update(arr => shuffleArray(arr)),
+    );
+  }
+}
+```
 
 ---
 
-## Документация
+## Documentation
 
-| Раздел | Описание |
-|--------|---------|
-| [Начало работы](docs/getting-started.md) | Установка, настройка, первые шаги |
-| [Vue 3](docs/vue.md) | Composable `useCardAnimation`, FLIP-паттерн, примеры |
-| [React](docs/react.md) | Хук `useCardAnimation`, FLIP-паттерн, примеры |
-| [API Reference](docs/api.md) | Классы, методы, типы |
-| [Архитектура](docs/architecture.md) | Структура проекта, расширение библиотеки |
-| [Contributing](docs/contributing.md) | Как участвовать в разработке |
+| Section | Description |
+|---------|-------------|
+| [Getting Started](docs/getting-started.md) | Installation, setup, first steps |
+| [Vue 3](docs/vue.md) | `useCardAnimation` composable, FLIP pattern, examples |
+| [React](docs/react.md) | `useCardAnimation` hook, FLIP pattern, examples |
+| [Angular](docs/angular.md) | `CardAnimationService`, Signals, DI setup |
+| [API Reference](docs/api.md) | Classes, methods, types |
 
-## Лицензия
+## For Contributors
+
+| Section | Description |
+|---------|-------------|
+| [Architecture](docs/architecture.md) | Project structure, extending the library |
+| [Contributing](docs/contributing.md) | Dev setup, commands, testing |
+
+## License
 
 MIT
