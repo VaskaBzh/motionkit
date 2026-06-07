@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { AnimationBuilder } from '../../core/src';
+import { CardMoveAnimation } from '../../core/src/animations/CardMoveAnimation.ts';
 import type { CardAnimationHookOptions, UseCardAnimationReturn } from '../types';
 
 /**
@@ -18,7 +19,7 @@ import type { CardAnimationHookOptions, UseCardAnimationReturn } from '../types'
  * ```
  */
 export function useCardAnimation(options: CardAnimationHookOptions = {}): UseCardAnimationReturn {
-	const builderRef = useRef(new AnimationBuilder());
+	const builderRef = useRef(new AnimationBuilder().use(CardMoveAnimation));
 	const [isAnimating, setIsAnimating] = useState(false);
 
 	useEffect(() => {

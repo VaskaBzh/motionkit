@@ -1,5 +1,4 @@
 import { TrajectoryCalculator } from '../calculators/TrajectoryCalculator.ts';
-import { CardMoveAnimation } from '../animations/CardMoveAnimation.ts';
 import { AnimationRunner } from '../animations/AnimationRunner.ts';
 import type { BuilderConfig, AnimationConstructor } from '../types';
 
@@ -28,7 +27,7 @@ export class AnimationBuilder {
 		stagger: 0,
 	};
 	readonly #calculator: TrajectoryCalculator;
-	#animationModule: AnimationConstructor = CardMoveAnimation;
+	#animationModule: AnimationConstructor | null = null;
 
 	/**
 	 * @param calculator - Реализация TrajectoryCalculator (по умолчанию создаётся автоматически)
@@ -73,6 +72,13 @@ export class AnimationBuilder {
 	 * @param cards - Те же карточки, что и в `snapshot()`
 	 */
 	public buildAnimation(cards: Iterable<HTMLElement>): AnimationRunner {
+		if (!this.#animationModule) {
+			throw new Error(
+				'[AnimationBuilder] call .use(AnimationClass) before buildAnimation(). ' +
+				'Example: builder.use(CardMoveAnimation)'
+			);
+		}
+
 		const trajectories = this.#calculator.calculate(cards);
 		const runner = new AnimationRunner();
 		const AnimClass = this.#animationModule;

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { AnimationBuilder } from '../AnimationBuilder.ts';
+import { CardMoveAnimation } from '../../animations/CardMoveAnimation.ts';
 import { TrajectoryCalculator } from '../../calculators/TrajectoryCalculator.ts';
 import type { AnimationConstructor, Trajectory } from '../../types';
 
@@ -13,10 +14,19 @@ describe('AnimationBuilder', () => {
 		vi.spyOn(calc, 'before').mockReturnThis();
 		vi.spyOn(calc, 'calculate').mockReturnValue([]);
 
-		const builder = new AnimationBuilder(calc);
+		const builder = new AnimationBuilder(calc).use(CardMoveAnimation);
 		builder.snapshot([]);
 		const runner = builder.buildAnimation([]);
 		expect(runner).toBeDefined();
+	});
+
+	it('buildAnimation() без .use() бросает Error', () => {
+		const calc = new TrajectoryCalculator();
+		vi.spyOn(calc, 'calculate').mockReturnValue([]);
+
+		expect(() => new AnimationBuilder(calc).buildAnimation([])).toThrow(
+			'[AnimationBuilder] call .use(AnimationClass) before buildAnimation()'
+		);
 	});
 
 	it('withDuration, withEasing, withStagger возвращают this', () => {
@@ -58,7 +68,7 @@ describe('AnimationBuilder', () => {
 			makeTrajectory(el2, 0, 50),
 		]);
 
-		const runner = new AnimationBuilder(calc).buildAnimation([el1, el2]);
+		const runner = new AnimationBuilder(calc).use(CardMoveAnimation).buildAnimation([el1, el2]);
 		el1.animate = vi.fn().mockReturnValue({ finished: Promise.resolve(), reverse: vi.fn() });
 		el2.animate = vi.fn().mockReturnValue({ finished: Promise.resolve(), reverse: vi.fn() });
 
@@ -69,7 +79,7 @@ describe('AnimationBuilder', () => {
 		const calc = new TrajectoryCalculator();
 		vi.spyOn(calc, 'calculate').mockReturnValue([]);
 
-		const runner = new AnimationBuilder(calc).buildAnimation([]);
+		const runner = new AnimationBuilder(calc).use(CardMoveAnimation).buildAnimation([]);
 		await expect(runner.play()).resolves.toBeUndefined();
 	});
 

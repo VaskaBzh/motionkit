@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { AnimationBuilder } from '../../core/src';
+import { CardMoveAnimation } from '../../core/src/animations/CardMoveAnimation.ts';
 import type { CardAnimationServiceOptions, CardAnimationServiceContract } from '../types';
 
 /**
@@ -26,7 +27,7 @@ import type { CardAnimationServiceOptions, CardAnimationServiceContract } from '
  */
 @Injectable()
 export class CardAnimationService implements CardAnimationServiceContract {
-	readonly #builder = new AnimationBuilder();
+	readonly #builder = new AnimationBuilder().use(CardMoveAnimation);
 
 	/** Angular Signal: true пока идёт анимация. Читать как `isAnimating()`. */
 	readonly isAnimating = signal(false);
