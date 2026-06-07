@@ -75,7 +75,7 @@ export class AnimationBuilder {
 	 * @param cards - Те же карточки, что и в `snapshot()`
 	 */
 	public buildAnimation(cards: Iterable<HTMLElement>): AnimationRunner {
-		if (!this.#hasSnapshot && import.meta.env?.DEV !== false) {
+		if (!this.#hasSnapshot && import.meta.env.DEV) {
 			console.warn('[AnimationBuilder] buildAnimation() called without a prior snapshot(). No elements will animate.');
 		}
 
