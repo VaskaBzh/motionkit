@@ -25,7 +25,14 @@ export class CardMoveAnimation extends BaseAnimation {
 		this.#options = { duration: 300, easing: 'ease', delay: 0, ...options };
 	}
 
+	public override cancel(): void {
+		this.#nativeAnimation?.cancel();
+		this.#nativeAnimation = null;
+	}
+
 	public override play(): Promise<void> {
+		this.cancel();
+
 		this.#nativeAnimation = this.#element.animate(
 			[
 				{ transform: `translate(${this.#deltaX}px, ${this.#deltaY}px)` },

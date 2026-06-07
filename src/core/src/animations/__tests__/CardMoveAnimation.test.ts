@@ -5,12 +5,14 @@ import type { Trajectory } from '../../types';
 interface AnimationLike {
 	finished: Promise<void>;
 	reverse: Mock;
+	cancel: Mock;
 }
 
 function makeAnimationMock(): AnimationLike {
 	return {
 		finished: Promise.resolve(),
 		reverse: vi.fn(),
+		cancel: vi.fn(),
 	};
 }
 
@@ -89,5 +91,43 @@ describe('CardMoveAnimation', () => {
 		const [keyframes] = (el.animate as Mock).mock.calls[0] as [Keyframe[]];
 		expect(keyframes[0]).toEqual({ transform: 'translate(0px, 0px)' });
 		expect(keyframes[1]).toEqual({ transform: 'translate(100px, 50px)' });
+	});
+
+	it('cancel() до play() не бросает ошибку', () => {
+		const anim = new CardMoveAnimation(el, makeTrajectory(el));
+		expect(() => anim.cancel()).not.toThrow();
+	});
+
+	it('cancel() после play() вызывает nativeAnimation.cancel()', async () => {
+		const nativeMock = makeAnimationMock();
+		(el.animate as Mock).mockReturnValue(nativeMock);
+
+		const anim = new CardMoveAnimation(el, makeTrajectory(el));
+		await anim.play();
+		anim.cancel();
+
+		expect(nativeMock.cancel).toHaveBeenCalledOnce();
+	});
+
+	it('повторный play() после cancel() запускает новую анимацию', async () => {
+		const anim = new CardMoveAnimation(el, makeTrajectory(el));
+		await anim.play();
+		anim.cancel();
+		await anim.play();
+
+		// eslint-disable-next-line @typescript-eslint/unbound-method
+		expect(el.animate).toHaveBeenCalledTimes(2);
+	});
+
+	it('play() отменяет предыдущую анимацию перед запуском новой', async () => {
+		const firstMock = makeAnimationMock();
+		const secondMock = makeAnimationMock();
+		(el.animate as Mock).mockReturnValueOnce(firstMock).mockReturnValueOnce(secondMock);
+
+		const anim = new CardMoveAnimation(el, makeTrajectory(el));
+		void anim.play();
+		await anim.play();
+
+		expect(firstMock.cancel).toHaveBeenCalledOnce();
 	});
 });
