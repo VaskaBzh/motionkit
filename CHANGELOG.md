@@ -9,10 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Angular integration: `CardAnimationService` with Signal-based `isAnimating` state and `afterNextRender` lifecycle support (PR #5)
-- High-level `animate(getElements, updateState)` method that handles the full FLIP cycle automatically
 - Angular demo app with Shuffle and Dynamic tabs (`demo-angular/`)
 - `docs/angular.md` — full Angular integration guide
 - `./angular` package export entry point (`@motionlab/motionkit/angular`)
+
+### Changed
+- Upgraded Angular dev dependencies to v22 (`@angular/build`, `@angular/core`, etc.) — resolves TypeScript 6 peer dependency conflict in CI
+- `dist-demo/` added to `.gitignore`
 
 ---
 
