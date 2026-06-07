@@ -47,6 +47,7 @@
       "types": "./dist/angular/index.d.ts"
     }
   },
+  "sideEffects": false,
   "main": "./dist/core.cjs",
   "module": "./dist/core.js",
   "types": "./dist/core/index.d.ts",
