@@ -1,0 +1,1 @@
+export type { CardAnimationServiceOptions, CardAnimationServiceContract } from './service.ts';
