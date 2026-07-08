@@ -23,5 +23,5 @@
     "exactOptionalPropertyTypes": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "demo-react"]
+  "include": ["src", "demo-react", "demo-vanilla"]
 }

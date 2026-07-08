@@ -9,8 +9,13 @@ import { DynamicDemoComponent } from './DynamicDemo.component';
 	template: `
 		<div class="demo-layout">
 			<header class="demo-header">
-				<h1>motion<span>.js</span> — Angular</h1>
+				<h1><a href="../index.html">motion<span>.js</span></a> — Angular</h1>
 			</header>
+
+			<pre class="usage"><code>anim = inject(CardAnimationService);   // providers: [CardAnimationService]
+anim.snapshot(els);                    // First: capture positions
+cards.update(shuffle);                 // reorder
+await anim.animateMove(els);           // Invert → Play</code></pre>
 
 			<nav class="tabs">
 				<button class="tab-btn" [class.active]="tab() === 'shuffle'" (click)="tab.set('shuffle')">
