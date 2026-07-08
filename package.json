@@ -54,6 +54,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:demo": "vite build --config vite.demo.config.ts",
+    "build:demo:angular": "vite build --config vite.demo.angular.config.ts",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
