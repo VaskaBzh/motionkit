@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import type { MockInstance } from 'vitest';
 import { AnimationBuilder } from '../AnimationBuilder.ts';
 import { TrajectoryCalculator } from '../../calculators/TrajectoryCalculator.ts';
 import type { AnimationConstructor, Trajectory } from '../../types';
@@ -74,7 +75,7 @@ describe('AnimationBuilder', () => {
 	});
 
 	describe('snapshot guard', () => {
-		let warnSpy: ReturnType<typeof vi.spyOn>;
+		let warnSpy: MockInstance<typeof console.warn>;
 
 		beforeEach(() => {
 			warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);

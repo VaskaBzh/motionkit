@@ -95,7 +95,9 @@ describe('CardMoveAnimation', () => {
 
 	it('cancel() до play() не бросает ошибку', () => {
 		const anim = new CardMoveAnimation(el, makeTrajectory(el));
-		expect(() => anim.cancel()).not.toThrow();
+		expect(() => {
+			anim.cancel();
+		}).not.toThrow();
 	});
 
 	it('cancel() после play() вызывает nativeAnimation.cancel()', async () => {
