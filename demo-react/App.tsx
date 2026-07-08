@@ -28,6 +28,11 @@ export default function App(): JSX.Element {
 				</nav>
 			</header>
 
+			<pre className="usage"><code>{`const { snapshot, animateMove } = useCardAnimation({ duration: 500 });
+snapshot(cardEls);          // First: capture positions
+setCards(shuffle(cards));   // reorder, React re-renders
+await animateMove(cardEls); // Invert → Play`}</code></pre>
+
 			{tab === 'shuffle' ? <ShuffleDemo /> : <DynamicDemo />}
 		</div>
 	);

@@ -15,6 +15,11 @@
         </nav>
       </header>
 
+      <pre class="usage"><code>const flip = new AnimationBuilder().withDuration(500);
+flip.snapshot(cards);                    // First: capture positions
+reorder(cards);                          // mutate the DOM
+await flip.buildAnimation(cards).play(); // Invert → Play</code></pre>
+
       <section id="tab-shuffle">
         <div class="controls">
           <label class="control">
