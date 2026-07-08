@@ -28,9 +28,12 @@ import { AnimationBuilder } from '@motionlab/motionkit/core';
 ### Basic Example
 
 ```typescript
+import { AnimationBuilder, CardMoveAnimation } from '@motionlab/motionkit/core';
+
 const cards = document.querySelectorAll<HTMLElement>('.card');
 
 const builder = new AnimationBuilder()
+  .use(CardMoveAnimation)  // register animation class (required)
   .withDuration(300)       // duration in ms (default: 300)
   .withEasing('ease')      // CSS easing function
   .withStagger(0);         // delay between cards in ms
@@ -49,7 +52,10 @@ await runner.play();
 ### With Stagger Effect
 
 ```typescript
+import { AnimationBuilder, CardMoveAnimation } from '@motionlab/motionkit/core';
+
 const builder = new AnimationBuilder()
+  .use(CardMoveAnimation)
   .withDuration(350)
   .withEasing('cubic-bezier(0.4, 0, 0.2, 1)')
   .withStagger(30);   // each next card starts 30ms later

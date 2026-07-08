@@ -12,10 +12,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Angular demo app with Shuffle and Dynamic tabs (`demo-angular/`)
 - `docs/angular.md` — full Angular integration guide
 - `./angular` package export entry point (`@motionlab/motionkit/angular`)
+- `cancel()` on `BaseAnimation` and `CardMoveAnimation` — stops the running animation immediately
+- `cancelAll()` on `AnimationRunner` — cancels and clears all queued animations
+- `respectReducedMotion` option in `CardMoveOptions` — collapses duration to 1 ms when the OS prefers reduced motion
 
 ### Changed
 - Upgraded Angular dev dependencies to v22 (`@angular/build`, `@angular/core`, etc.) — resolves TypeScript 6 peer dependency conflict in CI
 - `dist-demo/` added to `.gitignore`
+- `package.json`: added `"sideEffects": false` for tree-shaking support
+
+### Breaking Changes
+
+#### `AnimationBuilder` no longer defaults to `CardMoveAnimation`
+
+Before:
+```typescript
+const builder = new AnimationBuilder(); // CardMoveAnimation was used implicitly
+```
+
+After:
+```typescript
+import { AnimationBuilder, CardMoveAnimation } from '@motionlab/motionkit/core';
+
+const builder = new AnimationBuilder().use(CardMoveAnimation); // explicit, required
+```
+
+**Why:** The old default coupled `AnimationBuilder` to `CardMoveAnimation` at the module level, which prevented bundlers from tree-shaking `CardMoveAnimation` when only a custom animation class was used. With an explicit `.use()` call, bundlers can eliminate unused animation code.
+
+**Migration:** Add `.use(CardMoveAnimation)` to every `AnimationBuilder` call. Calling `buildAnimation()` without `.use()` throws an error with a descriptive message.
 
 ---
 

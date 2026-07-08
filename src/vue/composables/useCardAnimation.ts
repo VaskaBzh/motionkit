@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import { AnimationBuilder } from '../../core/src';
+import { CardMoveAnimation } from '../../core/src/animations/CardMoveAnimation.ts';
 import type { CardAnimationComposableOptions, UseCardAnimationReturn } from '../types';
 
 /**
@@ -21,7 +22,7 @@ import type { CardAnimationComposableOptions, UseCardAnimationReturn } from '../
  * ```
  */
 export function useCardAnimation(options: CardAnimationComposableOptions = {}): UseCardAnimationReturn {
-	const builder = new AnimationBuilder();
+	const builder = new AnimationBuilder().use(CardMoveAnimation);
 	const isAnimating = ref(false);
 
 	if (options.duration !== undefined) builder.withDuration(options.duration);
