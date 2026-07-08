@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { useCardAnimation } from '../useCardAnimation.ts';
-import { makeElement } from '../../../__tests__/makeElement.ts';
+import { makeElement, moveTo } from '../../../__tests__/makeElement.ts';
 
 describe('useCardAnimation', () => {
 	beforeEach(() => {
@@ -17,14 +17,9 @@ describe('useCardAnimation', () => {
 	it('isAnimating становится true во время анимации и false после', async () => {
 		const { snapshot, animateMove, isAnimating } = useCardAnimation();
 
-		const el = makeElement(0, 0);
+		const el = makeElement();
 		snapshot([el]);
-
-		// Simulate element shift
-		vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
-			left: 100, top: 50, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0,
-			toJSON: () => ({}),
-		});
+		moveTo(el, { left: 100, top: 50 });
 
 		const promise = animateMove([el]);
 		expect(isAnimating.value).toBe(true);
@@ -35,17 +30,14 @@ describe('useCardAnimation', () => {
 	it('isAnimating становится false даже при ошибке', async () => {
 		const { snapshot, animateMove, isAnimating } = useCardAnimation();
 
-		const el = makeElement(0, 0);
+		const el = makeElement();
 		el.animate = vi.fn().mockReturnValue({
 			finished: Promise.reject(new Error('animation failed')),
 			reverse: vi.fn(),
 		});
 
 		snapshot([el]);
-		vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
-			left: 100, top: 0, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0,
-			toJSON: () => ({}),
-		});
+		moveTo(el, { left: 100 });
 
 		await expect(animateMove([el])).rejects.toThrow('animation failed');
 		expect(isAnimating.value).toBe(false);
@@ -58,12 +50,9 @@ describe('useCardAnimation', () => {
 			stagger: 20,
 		});
 
-		const el = makeElement(0, 0);
+		const el = makeElement();
 		snapshot([el]);
-		vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
-			left: 100, top: 0, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0,
-			toJSON: () => ({}),
-		});
+		moveTo(el, { left: 100 });
 
 		await animateMove([el]);
 
@@ -81,5 +70,20 @@ describe('useCardAnimation', () => {
 		expect(isAnimating.value).toBe(false);
 		// eslint-disable-next-line @typescript-eslint/unbound-method
 		expect(el.animate).not.toHaveBeenCalled();
+	});
+
+	it('stagger увеличивает delay для каждого следующего элемента', async () => {
+		const { snapshot, animateMove } = useCardAnimation({ stagger: 20 });
+
+		const els = [makeElement(), makeElement(), makeElement()];
+		snapshot(els);
+		els.forEach(el => { moveTo(el, { left: 100 }); });
+
+		await animateMove(els);
+
+		els.forEach((el, i) => {
+			const [, opts] = (el.animate as Mock).mock.calls[0] as [Keyframe[], KeyframeAnimationOptions];
+			expect(opts.delay).toBe(i * 20);
+		});
 	});
 });
