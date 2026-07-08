@@ -1,22 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { TrajectoryCalculator } from '../TrajectoryCalculator.ts';
-
-function makeElement(rect: Partial<DOMRect> = {}): HTMLElement {
-	const el = document.createElement('div');
-	vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
-		left: 0,
-		top: 0,
-		right: 0,
-		bottom: 0,
-		width: 0,
-		height: 0,
-		x: 0,
-		y: 0,
-		toJSON: () => ({}),
-		...rect,
-	});
-	return el;
-}
+import { makeElement, moveTo } from '../../../../__tests__/makeElement.ts';
 
 describe('TrajectoryCalculator', () => {
 	let calc: TrajectoryCalculator;
@@ -37,13 +21,10 @@ describe('TrajectoryCalculator', () => {
 	});
 
 	it('вычисляет deltaX и deltaY для сдвинувшейся карточки', () => {
-		const card = document.createElement('div');
-		const mockRect = vi.spyOn(card, 'getBoundingClientRect');
-
-		mockRect.mockReturnValueOnce({ left: 100, top: 50, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0, toJSON: () => ({}) });
+		const card = makeElement({ left: 100, top: 50 });
 		calc.before([card]);
 
-		mockRect.mockReturnValueOnce({ left: 200, top: 80, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0, toJSON: () => ({}) });
+		moveTo(card, { left: 200, top: 80 });
 		const trajectories = calc.calculate([card]);
 
 		expect(trajectories).toHaveLength(1);
@@ -53,18 +34,11 @@ describe('TrajectoryCalculator', () => {
 	});
 
 	it('фильтрует неподвижные карточки', () => {
-		const moving = document.createElement('div');
-		const still = document.createElement('div');
-
-		const movingRect = vi.spyOn(moving, 'getBoundingClientRect');
-		const stillRect = vi.spyOn(still, 'getBoundingClientRect');
-
-		movingRect.mockReturnValueOnce({ left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0, toJSON: () => ({}) });
-		stillRect.mockReturnValueOnce({ left: 50, top: 50, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0, toJSON: () => ({}) });
+		const moving = makeElement({ left: 0, top: 0 });
+		const still = makeElement({ left: 50, top: 50 });
 		calc.before([moving, still]);
 
-		movingRect.mockReturnValueOnce({ left: 100, top: 100, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0, toJSON: () => ({}) });
-		stillRect.mockReturnValueOnce({ left: 50, top: 50, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0, toJSON: () => ({}) });
+		moveTo(moving, { left: 100, top: 100 });
 		const trajectories = calc.calculate([moving, still]);
 
 		expect(trajectories).toHaveLength(1);
@@ -78,10 +52,7 @@ describe('TrajectoryCalculator', () => {
 		const card2 = makeElement({ left: 0, top: 0 });
 		calc.before([card2]);
 
-		// card не в новом снимке — его траектория не считается
-		vi.spyOn(card, 'getBoundingClientRect').mockReturnValue({
-			left: 99, top: 99, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0, toJSON: () => ({}),
-		});
+		moveTo(card, { left: 99, top: 99 });
 		const trajectories = calc.calculate([card]);
 		expect(trajectories).toHaveLength(0);
 	});

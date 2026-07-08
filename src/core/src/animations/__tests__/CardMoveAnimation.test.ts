@@ -1,28 +1,6 @@
-import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
+import { describe, it, expect, beforeEach, type Mock } from 'vitest';
 import { CardMoveAnimation } from '../CardMoveAnimation.ts';
-import type { Trajectory } from '../../types';
-
-interface AnimationLike {
-	finished: Promise<void>;
-	reverse: Mock;
-}
-
-function makeAnimationMock(): AnimationLike {
-	return {
-		finished: Promise.resolve(),
-		reverse: vi.fn(),
-	};
-}
-
-function makeElement(): HTMLElement {
-	const el = document.createElement('div');
-	el.animate = vi.fn().mockReturnValue(makeAnimationMock());
-	return el;
-}
-
-function makeTrajectory(el: HTMLElement, dx = 100, dy = 50): Trajectory {
-	return { element: el, deltaX: dx, deltaY: dy };
-}
+import { makeElement, makeAnimationMock, makeTrajectory } from '../../../../__tests__/makeElement.ts';
 
 describe('CardMoveAnimation', () => {
 	let el: HTMLElement;
