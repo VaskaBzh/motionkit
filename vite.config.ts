@@ -24,6 +24,7 @@ export default defineConfig({
 				`${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
 		},
 		rollupOptions: {
+			checks: { pluginTimings: false },
 			external: ['vue', 'react', 'react-dom', '@angular/core'],
 			output: {
 				globals: { vue: 'Vue', react: 'React', 'react-dom': 'ReactDOM', '@angular/core': 'ng.core' },
