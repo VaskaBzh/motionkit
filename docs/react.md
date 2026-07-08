@@ -1,8 +1,10 @@
-# React integration
+[Back to README](../README.md) · [API Reference →](api.md)
 
-`@motionlab/motionkit/react` предоставляет хук `useCardAnimation` — React-аналог Vue composable с идентичным FLIP-API.
+# React Integration
 
-## Установка
+`@motionlab/motionkit/react` provides the `useCardAnimation` hook — a React equivalent of the Vue composable with an identical FLIP API.
+
+## Installation
 
 ```bash
 npm install @motionlab/motionkit react react-dom
@@ -18,50 +20,50 @@ import { useCardAnimation } from '@motionlab/motionkit/react';
 const { snapshot, animateMove, isAnimating } = useCardAnimation(options);
 ```
 
-**Параметры `CardAnimationHookOptions`:**
+**`CardAnimationHookOptions` parameters:**
 
-| Параметр   | Тип      | По умолчанию | Описание                              |
-|------------|----------|--------------|---------------------------------------|
-| `duration` | `number` | `300`        | Длительность анимации в мс            |
-| `easing`   | `string` | `'ease'`     | CSS-функция плавности                 |
-| `stagger`  | `number` | `0`          | Задержка между соседними карточками   |
-| `delay`    | `number` | `0`          | Начальная задержка                    |
+| Parameter  | Type     | Default  | Description                        |
+|------------|----------|----------|------------------------------------|
+| `duration` | `number` | `300`    | Animation duration in ms           |
+| `easing`   | `string` | `'ease'` | CSS easing function                |
+| `stagger`  | `number` | `0`      | Delay between adjacent cards in ms |
+| `delay`    | `number` | `0`      | Initial delay before animation     |
 
-**Возвращает `UseCardAnimationReturn`:**
+**Returns `UseCardAnimationReturn`:**
 
-| Поле          | Тип                                              | Описание                                 |
-|---------------|--------------------------------------------------|------------------------------------------|
-| `snapshot`    | `(cards: Iterable<HTMLElement>) => void`         | Запоминает позиции до изменения DOM      |
-| `animateMove` | `(cards: Iterable<HTMLElement>) => Promise<void>`| Запускает FLIP-анимацию после DOM-смены  |
-| `isAnimating` | `boolean`                                        | `true` пока идёт анимация                |
+| Field         | Type                                              | Description                           |
+|---------------|---------------------------------------------------|---------------------------------------|
+| `snapshot`    | `(cards: Iterable<HTMLElement>) => void`          | Records positions before DOM change   |
+| `animateMove` | `(cards: Iterable<HTMLElement>) => Promise<void>` | Plays FLIP animation after DOM change |
+| `isAnimating` | `boolean`                                         | `true` while animation is running     |
 
-> Отличие от Vue: `isAnimating` — обычный `boolean` (не `Ref<boolean>`). React управляет ре-рендером через `useState` внутри хука.
+> Unlike Vue, `isAnimating` is a plain `boolean` (not `Ref<boolean>`). React manages re-renders via `useState` inside the hook.
 
-## FLIP-паттерн в React
+## FLIP Pattern in React
 
-Ключевое отличие от Vue — React не имеет `nextTick`. Правильный паттерн: `snapshot` → `setState` → `useEffect` → `animateMove`.
+The key difference from Vue — React has no `nextTick`. The correct pattern is: `snapshot` → `setState` → `useEffect` → `animateMove`.
 
 ```tsx
 const cardRefs = useRef<(HTMLElement | null)[]>([]);
-const shouldAnimate = useRef(false); // сигнал "нужна анимация после рендера"
+const shouldAnimate = useRef(false); // signal: "animate after next render"
 
 const handleReorder = () => {
-  // 1. Снимок позиций ПЕРЕД изменением состояния
+  // 1. Snapshot positions BEFORE state change
   snapshot(cardRefs.current.filter((el): el is HTMLElement => el !== null));
   shouldAnimate.current = true;
-  // 2. Изменяем состояние → React перерисует DOM
+  // 2. Update state → React re-renders the DOM
   setCards(prev => reorder(prev));
 };
 
 useEffect(() => {
-  // 3. Запускаем анимацию ПОСЛЕ рендера
+  // 3. Play animation AFTER render
   if (!shouldAnimate.current) return;
   shouldAnimate.current = false;
   void animateMove(cardRefs.current.filter((el): el is HTMLElement => el !== null));
 }, [cards, animateMove]);
 ```
 
-Ref-массив для карточек заполняется через callback ref:
+Populate the ref array with a callback ref:
 
 ```tsx
 {cards.map((card, i) => (
@@ -71,9 +73,9 @@ Ref-массив для карточек заполняется через callb
 ))}
 ```
 
-## Пример: ShuffleDemo
+## Example: ShuffleDemo
 
-Перемешивание 6 карточек с настройкой параметров:
+Shuffle 6 cards with configurable parameters:
 
 ```tsx
 import { useState, useRef, useEffect } from 'react';
@@ -115,7 +117,7 @@ export function ShuffleDemo() {
 
   return (
     <>
-      <button onClick={handleShuffle} disabled={isAnimating}>Перемешать</button>
+      <button onClick={handleShuffle} disabled={isAnimating}>Shuffle</button>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
         {cards.map((card, i) => (
           <div
@@ -132,9 +134,9 @@ export function ShuffleDemo() {
 }
 ```
 
-## Пример: DynamicDemo
+## Example: DynamicDemo
 
-Добавление и удаление карточек с анимацией смещения:
+Add and remove cards with animated shifting:
 
 ```tsx
 export function DynamicDemo() {
@@ -157,20 +159,20 @@ export function DynamicDemo() {
 
   return (
     <>
-      <button onClick={() => trigger(prev => [newCard(), ...prev])}>+ в начало</button>
-      <button onClick={() => trigger(prev => [...prev, newCard()])}>+ в конец</button>
-      <button onClick={() => trigger(prev => prev.slice(1))}>− первую</button>
+      <button onClick={() => trigger(prev => [newCard(), ...prev])}>+ prepend</button>
+      <button onClick={() => trigger(prev => [...prev, newCard()])}>+ append</button>
+      <button onClick={() => trigger(prev => prev.slice(1))}>− remove first</button>
       {/* ... */}
     </>
   );
 }
 ```
 
-## Отличия от Vue
+## Differences from Vue
 
-| Аспект | Vue 3 | React |
-|---|---|---|
-| `isAnimating` | `Ref<boolean>` (`.value`) | `boolean` (напрямую) |
-| После DOM-изменения | `await nextTick()` | `useEffect([cards])` |
-| Сигнал анимации | неявный через порядок вызовов | `shouldAnimate` ref |
-| Стабильность builder | создаётся один раз в setup | `useRef(new AnimationBuilder())` |
+| Aspect            | Vue 3                              | React                           |
+|-------------------|------------------------------------|---------------------------------|
+| `isAnimating`     | `Ref<boolean>` (`.value`)          | `boolean` (direct)              |
+| After DOM change  | `await nextTick()`                 | `useEffect([cards])`            |
+| Animation signal  | implicit via call order            | `shouldAnimate` ref             |
+| Builder stability | created once in setup              | `useRef(new AnimationBuilder())`|

@@ -16,9 +16,9 @@ import type { BuilderConfig, AnimationConstructor } from '../types';
  *   .withEasing('cubic-bezier(0.4, 0, 0.2, 1)')
  *   .withStagger(30);
  *
- * builder.snapshot(cards);          // до изменения DOM
- * // ... изменяем DOM ...
- * await builder.buildAnimation(cards).play(); // после
+ * builder.snapshot(cards);          // before DOM change
+ * // ... change the DOM ...
+ * await builder.buildAnimation(cards).play(); // after
  * ```
  */
 export class AnimationBuilder {
@@ -29,6 +29,7 @@ export class AnimationBuilder {
 	};
 	readonly #calculator: TrajectoryCalculator;
 	#animationModule: AnimationConstructor = CardMoveAnimation;
+	#hasSnapshot = false;
 
 	/**
 	 * @param calculator - Реализация TrajectoryCalculator (по умолчанию создаётся автоматически)
@@ -64,6 +65,7 @@ export class AnimationBuilder {
 	/** Делает снимок позиций карточек до изменения DOM (шаг First). */
 	public snapshot(cards: Iterable<HTMLElement>): this {
 		this.#calculator.before(cards);
+		this.#hasSnapshot = true;
 		return this;
 	}
 
@@ -73,6 +75,10 @@ export class AnimationBuilder {
 	 * @param cards - Те же карточки, что и в `snapshot()`
 	 */
 	public buildAnimation(cards: Iterable<HTMLElement>): AnimationRunner {
+		if (!this.#hasSnapshot && import.meta.env.DEV) {
+			console.warn('[AnimationBuilder] buildAnimation() called without a prior snapshot(). No elements will animate.');
+		}
+
 		const trajectories = this.#calculator.calculate(cards);
 		const runner = new AnimationRunner();
 		const AnimClass = this.#animationModule;

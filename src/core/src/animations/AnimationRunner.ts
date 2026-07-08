@@ -25,6 +25,14 @@ export class AnimationRunner {
 		return Promise.all(this.#animations.map((anim) => anim.reverse())).then(() => undefined);
 	}
 
+	/** Отменяет все активные анимации и очищает список. */
+	public cancelAll(): void {
+		for (const anim of this.#animations) {
+			anim.cancel();
+		}
+		this.#animations.length = 0;
+	}
+
 	/** Очищает список анимаций. */
 	public clear(): this {
 		this.#animations.length = 0;

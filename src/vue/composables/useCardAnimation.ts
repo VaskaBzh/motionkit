@@ -13,7 +13,7 @@ import type { CardAnimationComposableOptions, UseCardAnimationReturn } from '../
  *
  * async function onReorder() {
  *   snapshot(cards.value);
- *   // изменяем порядок в реактивном массиве...
+ *   // reorder the reactive array...
  *   await nextTick();
  *   await animateMove(cards.value);
  * }

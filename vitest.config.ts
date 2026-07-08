@@ -4,6 +4,9 @@ import viteConfig from './vite.config';
 export default mergeConfig(
 	viteConfig,
 	defineConfig({
+		oxc: {
+			decorator: { legacy: true },
+		},
 		test: {
 			environment: 'happy-dom',
 			globals: true,

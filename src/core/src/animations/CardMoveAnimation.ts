@@ -10,6 +10,7 @@ export class CardMoveAnimation extends BaseAnimation {
 	readonly #deltaX: number;
 	readonly #deltaY: number;
 	readonly #options: Required<CardMoveOptions>;
+	readonly #reducedMotion: boolean;
 	#nativeAnimation: Animation | null = null;
 
 	/**
@@ -22,17 +23,28 @@ export class CardMoveAnimation extends BaseAnimation {
 		this.#element = element;
 		this.#deltaX = deltaX;
 		this.#deltaY = deltaY;
-		this.#options = { duration: 300, easing: 'ease', delay: 0, ...options };
+		this.#options = { duration: 300, easing: 'ease', delay: 0, respectReducedMotion: true, ...options };
+		this.#reducedMotion =
+			this.#options.respectReducedMotion &&
+			typeof window !== 'undefined' &&
+			window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	}
+
+	public override cancel(): void {
+		this.#nativeAnimation?.cancel();
+		this.#nativeAnimation = null;
 	}
 
 	public override play(): Promise<void> {
+		this.cancel();
+
 		this.#nativeAnimation = this.#element.animate(
 			[
 				{ transform: `translate(${this.#deltaX}px, ${this.#deltaY}px)` },
 				{ transform: 'translate(0px, 0px)' },
 			],
 			{
-				duration: this.#options.duration,
+				duration: this.#reducedMotion ? 1 : this.#options.duration,
 				easing: this.#options.easing,
 				delay: this.#options.delay,
 				fill: 'backwards',

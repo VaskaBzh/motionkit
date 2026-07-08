@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "erasableSyntaxOnly": false
+  },
+  "include": ["demo-angular", "src/angular"]
+}
