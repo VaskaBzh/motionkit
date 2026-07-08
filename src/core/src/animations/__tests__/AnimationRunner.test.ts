@@ -5,6 +5,7 @@ import { BaseAnimation } from '../../base/BaseAnimation.ts';
 class FakeAnimation extends BaseAnimation {
 	play = vi.fn().mockResolvedValue(undefined);
 	reverse = vi.fn().mockResolvedValue(undefined);
+	cancel = vi.fn();
 }
 
 describe('AnimationRunner', () => {
@@ -59,5 +60,28 @@ describe('AnimationRunner', () => {
 	it('clear() возвращает this для chaining', () => {
 		const runner = new AnimationRunner();
 		expect(runner.clear()).toBe(runner);
+	});
+
+	it('cancelAll() вызывает cancel() на всех анимациях', () => {
+		const runner = new AnimationRunner();
+		const a = new FakeAnimation();
+		const b = new FakeAnimation();
+		runner.add(a).add(b);
+
+		runner.cancelAll();
+
+		expect(a.cancel).toHaveBeenCalledOnce();
+		expect(b.cancel).toHaveBeenCalledOnce();
+	});
+
+	it('cancelAll() очищает список — последующий play() ничего не запускает', async () => {
+		const runner = new AnimationRunner();
+		const a = new FakeAnimation();
+		runner.add(a);
+
+		runner.cancelAll();
+		await runner.play();
+
+		expect(a.play).not.toHaveBeenCalled();
 	});
 });

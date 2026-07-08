@@ -21,9 +21,14 @@ export class TrajectoryCalculator {
 	public before(cards: Iterable<HTMLElement>): this {
 		this.#beforeSnapshot.clear();
 
-		for (const card of cards) {
-			const { left, top } = card.getBoundingClientRect();
-			this.#beforeSnapshot.set(card, { x: left, y: top });
+		// Читаем все rect-ы за один проход, не перемежая с другой логикой —
+		// один layout reflow вместо N.
+		const cardArray = [...cards];
+		const rects = cardArray.map((el) => el.getBoundingClientRect());
+
+		for (let i = 0; i < cardArray.length; i++) {
+			const rect = rects[i];
+			this.#beforeSnapshot.set(cardArray[i], { x: rect.left, y: rect.top });
 		}
 
 		return this;
@@ -35,15 +40,20 @@ export class TrajectoryCalculator {
 	 * @returns Массив траекторий только для карточек, которые сдвинулись
 	 */
 	public calculate(cards: Iterable<HTMLElement>): Trajectory[] {
+		// Читаем все rect-ы за один проход, не перемежая с другой логикой —
+		// один layout reflow вместо N.
+		const cardArray = [...cards];
+		const rects = cardArray.map((el) => el.getBoundingClientRect());
 		const trajectories: Trajectory[] = [];
 
-		for (const card of cards) {
+		for (let i = 0; i < cardArray.length; i++) {
+			const card = cardArray[i];
 			const before = this.#beforeSnapshot.get(card);
 			if (!before) continue;
 
-			const { left, top } = card.getBoundingClientRect();
-			const deltaX = before.x - left;
-			const deltaY = before.y - top;
+			const rect = rects[i];
+			const deltaX = before.x - rect.left;
+			const deltaY = before.y - rect.top;
 
 			if (deltaX !== 0 || deltaY !== 0) {
 				trajectories.push({ element: card, deltaX, deltaY });

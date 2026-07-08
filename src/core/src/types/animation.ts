@@ -9,6 +9,8 @@ export interface CardMoveOptions {
 	easing?: string;
 	/** Задержка старта в мс. По умолчанию 0. */
 	delay?: number;
+	/** Уважать системную настройку prefers-reduced-motion. По умолчанию true. */
+	respectReducedMotion?: boolean;
 }
 
 /** Контракт конструктора подключаемого модуля анимации. */

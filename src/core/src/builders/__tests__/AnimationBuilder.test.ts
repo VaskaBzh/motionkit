@@ -1,4 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import type { MockInstance } from 'vitest';
 import { AnimationBuilder } from '../AnimationBuilder.ts';
 import { TrajectoryCalculator } from '../../calculators/TrajectoryCalculator.ts';
 import type { AnimationConstructor, Trajectory } from '../../types';
@@ -71,6 +72,38 @@ describe('AnimationBuilder', () => {
 
 		const runner = new AnimationBuilder(calc).buildAnimation([]);
 		await expect(runner.play()).resolves.toBeUndefined();
+	});
+
+	describe('snapshot guard', () => {
+		let warnSpy: MockInstance<typeof console.warn>;
+
+		beforeEach(() => {
+			warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+		});
+
+		afterEach(() => {
+			warnSpy.mockRestore();
+		});
+
+		it('buildAnimation() без snapshot() вызывает console.warn', () => {
+			const calc = new TrajectoryCalculator();
+			vi.spyOn(calc, 'calculate').mockReturnValue([]);
+
+			new AnimationBuilder(calc).buildAnimation([]);
+
+			expect(warnSpy).toHaveBeenCalledOnce();
+			expect(warnSpy.mock.calls[0]?.[0]).toContain('[AnimationBuilder]');
+		});
+
+		it('buildAnimation() после snapshot() не вызывает console.warn', () => {
+			const calc = new TrajectoryCalculator();
+			vi.spyOn(calc, 'before').mockReturnThis();
+			vi.spyOn(calc, 'calculate').mockReturnValue([]);
+
+			new AnimationBuilder(calc).snapshot([]).buildAnimation([]);
+
+			expect(warnSpy).not.toHaveBeenCalled();
+		});
 	});
 
 	it('use() подключает пользовательский класс анимации', async () => {
