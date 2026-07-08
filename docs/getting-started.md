@@ -140,6 +140,22 @@ After playing the animation, cards should smoothly move to their new positions. 
 2. Make sure `buildAnimation()` is called **after** the DOM change (and after `nextTick()` in Vue)
 3. Verify that the cards actually moved (the library only animates cards where `deltaX !== 0 || deltaY !== 0`)
 
+## Known Limitations
+
+### CSS Transform Conflict
+
+If a card element has an existing CSS `transform` (e.g. `scale`, `rotate`), the FLIP animation will
+temporarily override it during playback. Workaround: wrap the card content in an inner element and
+apply motionkit to the outer wrapper only.
+
+```html
+<!-- outer: motionkit animates this -->
+<div class="card-wrapper" ref="cardRef">
+  <!-- inner: keep your CSS transforms here -->
+  <div class="card" style="transform: scale(1.05)">...</div>
+</div>
+```
+
 ## Next Steps
 
 - [API Reference](api.md) — full documentation for all classes and methods

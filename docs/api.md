@@ -110,7 +110,8 @@ import { AnimationRunner } from '@motionlab/motionkit/core';
 | `add(animation: BaseAnimation)` | `this` | Adds an animation to the queue |
 | `play()` | `Promise<void>` | Plays all animations in parallel |
 | `reverse()` | `Promise<void>` | Plays all animations in reverse |
-| `clear()` | `this` | Clears the animation list |
+| `cancelAll()` | `void` | Cancels all active animations and clears the list |
+| `clear()` | `this` | Clears the animation list without cancelling |
 
 ---
 
@@ -128,6 +129,7 @@ import { BaseAnimation } from '@motionlab/motionkit/core';
 |--------|---------|-------------|
 | `play()` | `Promise<void>` | Play the animation |
 | `reverse()` | `Promise<void>` | Play in reverse |
+| `cancel()` | `void` | Immediately stop the animation |
 
 ---
 
@@ -170,6 +172,7 @@ new CardMoveAnimation(element: HTMLElement, trajectory: Trajectory, options?: Ca
 |--------|---------|-------------|
 | `play()` | `Promise<void>` | Animates the card from its old position to the new one |
 | `reverse()` | `Promise<void>` | Animates in the reverse direction |
+| `cancel()` | `void` | Immediately stops the current animation |
 
 ---
 
@@ -216,9 +219,10 @@ interface Trajectory {
 
 /** Per-card animation options. */
 interface CardMoveOptions {
-  duration?: number;  // ms, default 300
-  easing?: string;    // CSS function, default 'ease'
-  delay?: number;     // ms, default 0
+  duration?: number;              // ms, default 300
+  easing?: string;                // CSS function, default 'ease'
+  delay?: number;                 // ms, default 0
+  respectReducedMotion?: boolean; // collapse duration to 1ms when prefers-reduced-motion, default true
 }
 
 /** Final builder configuration. */
@@ -232,6 +236,26 @@ interface BuilderConfig {
 interface AnimationConstructor {
   new(element: HTMLElement, trajectory: Trajectory, options?: CardMoveOptions): BaseAnimation;
 }
+```
+
+---
+
+## Known Limitations
+
+### CSS Transform Conflict
+
+If a card element already has a CSS `transform` (e.g. `scale`, `rotate`), the FLIP animation will
+temporarily override it during playback because the Web Animations API replaces the `transform`
+property with its own keyframes.
+
+**Workaround:** wrap the card content in an inner element and apply motionkit to the outer wrapper only:
+
+```html
+<!-- outer: motionkit animates this element -->
+<div class="card-wrapper" ref="cardRef">
+  <!-- inner: apply your CSS transforms here -->
+  <div class="card" style="transform: scale(1.05)">...</div>
+</div>
 ```
 
 ## See Also

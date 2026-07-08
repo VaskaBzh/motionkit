@@ -17,10 +17,11 @@ export function moveTo(el: HTMLElement, rect: Partial<DOMRect>): void {
 	vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({ ...DEFAULT_RECT, ...rect });
 }
 
-export function makeAnimationMock(): { finished: Promise<void>; reverse: Mock } {
+export function makeAnimationMock(): { finished: Promise<void>; reverse: Mock; cancel: Mock } {
 	return {
 		finished: Promise.resolve(),
 		reverse: vi.fn(),
+		cancel: vi.fn(),
 	};
 }
 

@@ -28,6 +28,7 @@ export class AnimationBuilder {
 	};
 	readonly #calculator: TrajectoryCalculator;
 	#animationModule: AnimationConstructor | null = null;
+	#hasSnapshot = false;
 
 	/**
 	 * @param calculator - Реализация TrajectoryCalculator (по умолчанию создаётся автоматически)
@@ -63,6 +64,7 @@ export class AnimationBuilder {
 	/** Делает снимок позиций карточек до изменения DOM (шаг First). */
 	public snapshot(cards: Iterable<HTMLElement>): this {
 		this.#calculator.before(cards);
+		this.#hasSnapshot = true;
 		return this;
 	}
 
@@ -77,6 +79,10 @@ export class AnimationBuilder {
 				'[AnimationBuilder] call .use(AnimationClass) before buildAnimation(). ' +
 				'Example: builder.use(CardMoveAnimation)'
 			);
+		}
+
+		if (!this.#hasSnapshot && import.meta.env.DEV) {
+			console.warn('[AnimationBuilder] buildAnimation() called without a prior snapshot(). No elements will animate.');
 		}
 
 		const trajectories = this.#calculator.calculate(cards);
