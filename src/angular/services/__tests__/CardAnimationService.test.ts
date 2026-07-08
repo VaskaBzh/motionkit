@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { CardAnimationService } from '../CardAnimationService.ts';
-import { makeElement } from '../../../__tests__/makeElement.ts';
+import { makeElement, moveTo } from '../../../__tests__/makeElement.ts';
 
 describe('CardAnimationService', () => {
 	let service: CardAnimationService;
@@ -15,13 +15,9 @@ describe('CardAnimationService', () => {
 	});
 
 	it('isAnimating становится true во время анимации и false после', async () => {
-		const el = makeElement(0, 0);
+		const el = makeElement();
 		service.snapshot([el]);
-
-		vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
-			left: 100, top: 50, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0,
-			toJSON: () => ({}),
-		});
+		moveTo(el, { left: 100, top: 50 });
 
 		const promise = service.animateMove([el]);
 		expect(service.isAnimating()).toBe(true);
@@ -30,17 +26,14 @@ describe('CardAnimationService', () => {
 	});
 
 	it('isAnimating становится false даже при ошибке', async () => {
-		const el = makeElement(0, 0);
+		const el = makeElement();
 		el.animate = vi.fn().mockReturnValue({
 			finished: Promise.reject(new Error('animation failed')),
 			reverse: vi.fn(),
 		});
 
 		service.snapshot([el]);
-		vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
-			left: 100, top: 0, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0,
-			toJSON: () => ({}),
-		});
+		moveTo(el, { left: 100 });
 
 		await expect(service.animateMove([el])).rejects.toThrow('animation failed');
 		expect(service.isAnimating()).toBe(false);
@@ -49,12 +42,9 @@ describe('CardAnimationService', () => {
 	it('принимает options через configure: duration, easing, stagger', async () => {
 		service.configure({ duration: 500, easing: 'linear', stagger: 20 });
 
-		const el = makeElement(0, 0);
+		const el = makeElement();
 		service.snapshot([el]);
-		vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
-			left: 100, top: 0, right: 0, bottom: 0, width: 0, height: 0, x: 0, y: 0,
-			toJSON: () => ({}),
-		});
+		moveTo(el, { left: 100 });
 
 		await service.animateMove([el]);
 
@@ -71,5 +61,20 @@ describe('CardAnimationService', () => {
 		expect(service.isAnimating()).toBe(false);
 		// eslint-disable-next-line @typescript-eslint/unbound-method
 		expect(el.animate).not.toHaveBeenCalled();
+	});
+
+	it('stagger увеличивает delay для каждого следующего элемента', async () => {
+		service.configure({ stagger: 20 });
+
+		const els = [makeElement(), makeElement(), makeElement()];
+		service.snapshot(els);
+		els.forEach(el => { moveTo(el, { left: 100 }); });
+
+		await service.animateMove(els);
+
+		els.forEach((el, i) => {
+			const [, opts] = (el.animate as Mock).mock.calls[0] as [Keyframe[], KeyframeAnimationOptions];
+			expect(opts.delay).toBe(i * 20);
+		});
 	});
 });
